@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package harbour.auth.v1;
+
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+  rpc SendSmsCode(SendSmsCodeRequest) returns (SendSmsCodeResponse) {}
+  rpc SendEmailCode(SendEmailCodeRequest) returns (SendEmailCodeResponse) {}
+
+  // Requires 2FA authentication
+  rpc GetTwoFactor(GetTwoFactorRequest) returns (GetTwoFactorResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Requires full authentication
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {}
+}
+
+message LoginRequest {
+  message EmailPasswordLogin {
+    string email = 1;
+    string password = 2;
+  }
+
+  message TenantUsernamePasswordLogin {
+    uint32 tenant_id = 1;
+    string username = 2;
+    string password = 3;
+  }
+
+  message SMSCodeLogin {
+    string phone_number = 1;
+    string code = 2;
+  }
+
+  message EmailCodeLogin {
+    string email = 1;
+    string code = 2;
+  }
+
+  message AuthenticatorAppLogin {
+    string code = 1;
+  }
+
+  message SingeUseCodeLogin {
+    string code = 1;
+  }
+
+  bool remember_me = 1;
+  oneof method {
+    EmailPasswordLogin email = 2;
+    TenantUsernamePasswordLogin username = 3;
+    SMSCodeLogin sms_code = 4;
+    EmailCodeLogin email_code = 5;
+    AuthenticatorAppLogin authenticator_app = 6;
+    SingeUseCodeLogin single_use_code = 7;
+  }
+}
+
+message LoginResponse {
+  enum LoginStatus {
+    LOGIN_STATUS_UNSPECIFIED = 0;
+    LOGIN_STATUS_SUCCESS = 1;
+    LOGIN_STATUS_TWO_FACTOR = 3;
+  }
+
+  LoginStatus status = 1;
+}
+
+message SendSmsCodeRequest {
+  string phone_number = 1;  // follows E.164
+}
+
+message SendSmsCodeResponse {}
+
+message SendEmailCodeRequest {
+  string email = 1;
+}
+
+message SendEmailCodeResponse {}
+
+message GetTwoFactorRequest {}
+
+message GetTwoFactorResponse {
+  message SmsTwoFactorInfo {
+    string phone_number = 1;
+  }
+
+  message EmailTwoFactorInfo {
+    string email = 1;
+  }
+
+  repeated SmsTwoFactorInfo sms = 1;
+  repeated EmailTwoFactorInfo email = 2;
+  bool authenticator_app = 3;
+  bool single_use_code = 4;
+}
+
+message LogoutRequest {}
+
+message LogoutResponse {}
