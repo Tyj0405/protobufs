@@ -1,0 +1,153 @@
+syntax = "proto3";
+
+package harbour.incident.v1;
+
+import "google/protobuf/timestamp.proto";
+
+service IncidentService {
+  // Returns incident summaries for the administrator list and staff mobile list.
+  rpc ListIncidents(ListIncidentsRequest) returns (ListIncidentsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns one incident together with its complete status-log history.
+  rpc GetIncident(GetIncidentRequest) returns (GetIncidentResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Creates an incident and its initial Open log for the authenticated user.
+  rpc CreateIncident(CreateIncidentRequest) returns (CreateIncidentResponse) {}
+
+  // Adds a new status log. The newest log becomes the current incident status.
+  rpc AppendIncidentLog(AppendIncidentLogRequest) returns (AppendIncidentLogResponse) {}
+}
+
+enum IncidentStatus {
+  INCIDENT_STATUS_UNSPECIFIED = 0;
+  INCIDENT_STATUS_OPEN = 1;
+  INCIDENT_STATUS_INVESTIGATING = 2;
+  INCIDENT_STATUS_RESOLVING = 3;
+  INCIDENT_STATUS_RESOLVED = 4;
+  INCIDENT_STATUS_NOT_PLANNED = 5;
+}
+
+message UserReference {
+  uint64 id = 1;
+  string username = 2;
+}
+
+message LocationReference {
+  uint64 id = 1;
+  string name = 2;
+}
+
+message IncidentLocation {
+  uint64 port_id = 1;
+  string port_name = 2;
+
+  oneof specific_location {
+    LocationReference berth = 3;
+    LocationReference wharf = 4;
+    LocationReference terminal = 5;
+  }
+}
+
+message FileReference {
+  uint64 id = 1;
+  string filename = 2;
+  string url = 3;
+  uint64 size_kb = 4;
+  string mimetype = 5;
+  uint64 uploader_id = 6;
+}
+
+message IncidentLogImage {
+  FileReference file = 1;
+  optional string remarks = 2;
+}
+
+message IncidentLog {
+  uint64 id = 1;
+  IncidentStatus status = 2;
+  string description = 3;
+  optional string remarks = 4;
+  google.protobuf.Timestamp created_at = 5;
+  repeated IncidentLogImage images = 6;
+}
+
+message IncidentSummary {
+  uint64 id = 1;
+  string description = 2;
+  IncidentLocation location = 3;
+  UserReference created_by = 4;
+  google.protobuf.Timestamp created_at = 5;
+  IncidentStatus current_status = 6;
+  uint32 evidence_count = 7;
+}
+
+message Incident {
+  IncidentSummary summary = 1;
+  repeated IncidentLog logs = 2;
+}
+
+message IncidentImageInput {
+  // The file must already exist in the files table.
+  uint64 file_id = 1;
+  optional string remarks = 2;
+}
+
+message ListIncidentsRequest {
+  uint64 port_id = 1;
+  optional IncidentStatus status = 2;
+  string search = 3;
+
+  // When true, the backend filters by the authenticated user.
+  bool created_by_me_only = 4;
+
+  uint32 page_size = 5;
+  string page_token = 6;
+}
+
+message ListIncidentsResponse {
+  repeated IncidentSummary incidents = 1;
+  string next_page_token = 2;
+}
+
+message GetIncidentRequest {
+  uint64 incident_id = 1;
+}
+
+message GetIncidentResponse {
+  Incident incident = 1;
+}
+
+message CreateIncidentRequest {
+  string description = 1;
+  uint64 port_id = 2;
+
+  oneof specific_location_id {
+    uint64 berth_id = 3;
+    uint64 wharf_id = 4;
+    uint64 terminal_id = 5;
+  }
+
+  // These files are linked to the initial Open incident log.
+  repeated IncidentImageInput images = 6;
+}
+
+message CreateIncidentResponse {
+  Incident incident = 1;
+}
+
+message AppendIncidentLogRequest {
+  uint64 incident_id = 1;
+  IncidentStatus status = 2;
+  string description = 3;
+  optional string remarks = 4;
+  repeated IncidentImageInput images = 5;
+}
+
+message AppendIncidentLogResponse {
+  IncidentLog log = 1;
+  IncidentStatus current_status = 2;
+}
