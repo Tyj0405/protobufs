@@ -24,14 +24,14 @@ service IncidentService {
 }
 
 message ListIncidentsRequest {
-  uint64 port_id = 1;
+  int64 port_id = 1;
 
   // Filters by the status of the newest incident log.
   optional IncidentStatus latest_status = 2;
   optional string query = 3;
 
   // A general user filter. The backend must still enforce access permissions.
-  optional uint64 created_by_user_id = 4;
+  optional int64 created_by_user_id = 4;
   .harbour.common.v1.PaginationRequest pagination = 5;
 }
 
@@ -41,7 +41,7 @@ message ListIncidentsResponse {
 }
 
 message GetIncidentRequest {
-  uint64 incident_id = 1;
+  int64 incident_id = 1;
 }
 
 message GetIncidentResponse {
@@ -50,12 +50,12 @@ message GetIncidentResponse {
 
 message CreateIncidentRequest {
   string description = 1;
-  uint64 port_id = 2;
+  int64 port_id = 2;
 
   oneof specific_location_id {
-    uint64 berth_id = 3;
-    uint64 wharf_id = 4;
-    uint64 terminal_id = 5;
+    int64 berth_id = 3;
+    int64 wharf_id = 4;
+    int64 terminal_id = 5;
   }
 
   repeated IncidentImageInput images = 6;
@@ -66,7 +66,7 @@ message CreateIncidentResponse {
 }
 
 message AppendIncidentLogRequest {
-  uint64 incident_id = 1;
+  int64 incident_id = 1;
   IncidentStatus status = 2;
   string description = 3;
   optional string remarks = 4;
@@ -88,10 +88,11 @@ enum IncidentStatus {
 }
 
 message Incident {
-  uint64 id = 1;
+  int64 id = 1;
   string description = 2;
-  uint64 port_id = 3;
-  string port_name = 4;
+  .harbour.common.v1.LocationReference port = 3;
+
+  reserved 4;
 
   oneof specific_location {
     .harbour.common.v1.LocationReference berth = 5;
@@ -112,7 +113,7 @@ message IncidentDetails {
 }
 
 message IncidentLog {
-  uint64 id = 1;
+  int64 id = 1;
   IncidentStatus status = 2;
   string description = 3;
   optional string remarks = 4;
@@ -126,6 +127,6 @@ message IncidentLogImage {
 }
 
 message IncidentImageInput {
-  uint64 file_id = 1;
+  int64 file_id = 1;
   optional string remarks = 2;
 }
