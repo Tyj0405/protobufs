@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package harbour.common.v1;
+
+// A lightweight user value for display in other modules.
+message UserReference {
+  uint64 id = 1;
+  string username = 2;
+}
+
+// A lightweight location value for display in other modules.
+message LocationReference {
+  uint64 id = 1;
+  string name = 2;
+}
+
+// Only the file information required to render or download an attachment.
+message FileReference {
+  uint64 id = 1;
+  string filename = 2;
+  string url = 3;
+  string mimetype = 4;
+}
+
+// Reusable cursor-based pagination input.
+message PaginationRequest {
+  uint32 page_size = 1;
+  optional string page_token = 2;
+}
+
+// Reusable cursor-based pagination output.
+message PaginationResponse {
+  optional string next_page_token = 1;
+}
