@@ -68,7 +68,7 @@ message LoginResponse {
 }
 
 message SendSmsCodeRequest {
-  string phone_number = 1;  // follows E.164
+  string phone_number = 1; // follows E.164
 }
 
 message SendSmsCodeResponse {}
