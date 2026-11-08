@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package harbour.tenant.v1;
+
+message RegisterTenantInformation {
+  string identifier = 1;
+  string name = 2;
+}

@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package harbour.tenant.v1;
+
+import "harbour/common/v1/status.proto";
+import "harbour/account/v1/register_account.proto";
+import "harbour/tenant/v1/register_tenant.proto";
+
+service TenantService {
+  rpc RegisterTenant(RegisterTenantRequest) returns (RegisterTenantResponse) {}
+  rpc RequestTenantDeletion(RequestTenantDeletionRequest) returns (RequestTenantDeletionResponse) {}
+}
+
+message RegisterTenantRequest {
+   harbour.tenant.v1.RegisterTenantInformation tenant = 1;
+   harbour.account.v1.RegisterUser root_user = 2;
+}
+
+message RegisterTenantResponse {
+  harbour.common.v1.Status status = 1;
+}
+
+message RequestTenantDeletionRequest {
+  int64 tenant_id = 1;
+}
+
+message RequestTenantDeletionResponse {
+ harbour.common.v1.Status status = 1;
+}
