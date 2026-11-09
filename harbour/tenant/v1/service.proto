@@ -17,7 +17,6 @@ message RegisterTenantRequest {
 }
 
 message RegisterTenantResponse {
-  harbour.common.v1.Status status = 1;
 }
 
 message RequestTenantDeletionRequest {
@@ -25,5 +24,4 @@ message RequestTenantDeletionRequest {
 }
 
 message RequestTenantDeletionResponse {
- harbour.common.v1.Status status = 1;
 }
