@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package harbour.tenant.v1;
 
-import "harbour/common/v1/status.proto";
 import "harbour/account/v1/register_account.proto";
 import "harbour/tenant/v1/register_tenant.proto";
 
