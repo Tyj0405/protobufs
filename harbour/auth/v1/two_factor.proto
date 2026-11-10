@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package harbour.auth.v1;
+
+message SmsTwoFactorInfo {
+  string phone_number = 1;
+}
+
+message EmailTwoFactorInfo {
+  string email = 1;
+}
+
+message SMSCodeLogin {
+  string phone_number = 1;
+  string code = 2;
+}
+
+message EmailCodeLogin {
+  string email = 1;
+  string code = 2;
+}
+
+message AuthenticatorAppLogin {
+  string code = 1;
+}
+
+message SingeUseCodeLogin {
+  string code = 1;
+}

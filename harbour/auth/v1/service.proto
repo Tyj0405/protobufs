@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package harbour.auth.v1;
+
+import "harbour/auth/v1/two_factor.proto";
+
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {}
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {}
+
+  rpc SubmitTwoFactor(SubmitTwoFactorRequest) returns (SubmitTwoFactorResponse) {}
+
+  rpc SendSmsCode(SendSmsCodeRequest) returns (SendSmsCodeResponse) {}
+  rpc SendEmailCode(SendEmailCodeRequest) returns (SendEmailCodeResponse) {}
+
+  // Requires 2FA authentication
+  rpc GetTwoFactor(GetTwoFactorRequest) returns (GetTwoFactorResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message LoginRequest {
+  string tenant_id = 1;
+  string username = 2; // Can be email as well
+  string password = 3;
+}
+
+message LoginResponse {
+  bool two_factor = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message LogoutRequest {
+  string refresh_token = 1;
+}
+
+message LogoutResponse {}
+
+message SubmitTwoFactorRequest {
+  oneof method {
+    SMSCodeLogin sms = 1;
+    EmailCodeLogin email = 2;
+    AuthenticatorAppLogin totp = 3;
+    SingeUseCodeLogin single_use = 4;
+  }
+}
+
+message SubmitTwoFactorResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message SendSmsCodeRequest {
+  string phone_number = 1; // follows E.164
+}
+
+message SendSmsCodeResponse {}
+
+message SendEmailCodeRequest {
+  string email = 1;
+}
+
+message SendEmailCodeResponse {}
+
+message GetTwoFactorRequest {}
+
+message GetTwoFactorResponse {
+  repeated SmsTwoFactorInfo sms = 1;
+  repeated EmailTwoFactorInfo email = 2;
+  bool authenticator_app = 3;
+  bool single_use_code = 4;
+}
