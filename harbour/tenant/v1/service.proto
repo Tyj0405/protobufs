@@ -11,16 +11,14 @@ service TenantService {
 }
 
 message RegisterTenantRequest {
-   harbour.tenant.v1.RegisterTenantInformation tenant = 1;
-   harbour.account.v1.RegisterUser root_user = 2;
+  harbour.tenant.v1.RegisterTenantInformation tenant = 1;
+  harbour.account.v1.RegisterUser root_user = 2;
 }
 
-message RegisterTenantResponse {
-}
+message RegisterTenantResponse {}
 
 message RequestTenantDeletionRequest {
   int64 tenant_id = 1;
 }
 
-message RequestTenantDeletionResponse {
-}
+message RequestTenantDeletionResponse {}
