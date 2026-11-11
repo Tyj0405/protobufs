@@ -38,4 +38,5 @@ message IncidentLog {
   optional string remarks = 4;
   google.protobuf.Timestamp created_at = 5;
   repeated ImageEvidenceReference images = 6;
+  UserReference created_by = 7;
 }
