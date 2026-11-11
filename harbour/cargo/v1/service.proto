@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package harbour.cargo.v1;
+
+import "harbour/types/v1/pagination.proto";
+import "harbour/types/v1/cargo.proto";
+import "harbour/cargo/v1/get_cargo.proto";
+import "harbour/cargo/v1/create_cargo.proto";
+import "harbour/cargo/v1/update_cargo.proto";
+
+service CargoService {
+  rpc ListCargos(ListCargosRequest) returns (ListCargosResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc GetCargo(GetCargoRequest) returns (GetCargoResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc CreateCargo(CreateCargoRequest) returns (CreateCargoResponse) {}
+  rpc UpdateCargo(UpdateCargoRequest) returns (UpdateCargoResponse) {}
+
+  rpc ListUnitOfMeasures(ListUnitOfMeasuresRequest) returns (ListUnitOfMeasuresResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message ListCargosRequest {
+  optional string query = 1;
+  optional int64 unit_of_measure_id = 2;
+  optional int64 company_id = 3;
+  optional int64 vessel_id = 4;
+  optional int64 container_id = 5;
+
+  // A derived filter. Cargo has no status column in the database.
+  optional harbour.types.v1.CargoMovementStage latest_stage = 6;
+  harbour.types.v1.PaginationRequest pagination = 7;
+}
+
+message ListCargosResponse {
+  repeated CargoSummary cargos = 1;
+  harbour.types.v1.PaginationResponse pagination = 2;
+}
+
+message GetCargoRequest {
+  int64 cargo_id = 1;
+}
+
+message GetCargoResponse {
+  CargoDetails details = 1;
+}
+
+message CreateCargoRequest {
+  CreateCargo info = 1;
+}
+
+message CreateCargoResponse {
+  int64 created_id = 1;
+}
+
+message UpdateCargoRequest {
+  int64 cargo_id = 1;
+  UpdateCargo info = 2;
+}
+
+message UpdateCargoResponse {}
+
+message ListUnitOfMeasuresRequest {}
+
+message ListUnitOfMeasuresResponse {
+  repeated harbour.types.v1.UnitOfMeasure unit_of_measures = 1;
+}

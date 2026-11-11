@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package harbour.incident.v1;
+
+import "harbour/types/v1/incident.proto";
+
+message IncidentSummary {
+  harbour.types.v1.Incident info = 1;
+  harbour.types.v1.IncidentStatus latest_status = 9;
+  uint32 evidence_count = 10;
+}
+
+message IncidentDetails {
+  harbour.types.v1.Incident info = 1;
+  repeated harbour.types.v1.IncidentLog logs = 2;
+}

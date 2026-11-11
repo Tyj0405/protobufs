@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package harbour.task.v1;
+
+import "harbour/types/v1/pagination.proto";
+import "harbour/types/v1/task.proto";
+import "harbour/task/v1/get_task.proto";
+import "harbour/task/v1/create_task.proto";
+import "harbour/task/v1/append_task_log.proto";
+
+// TaskService supports the administrator desktop task list and the staff
+// mobile assigned-task workflow.
+service TaskService {
+  // Returns tasks for one Port, with optional status, search, and assignee
+  // filters. The backend must enforce which tasks the caller may view.
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns one task together with its complete task-log history.
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Creates a task and its initial Pending log for the authenticated creator.
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse) {}
+  // TODO: UpdateTask
+  // TODO: DeleteTask
+
+  // Adds a status/progress log. The newest log becomes the latest task status.
+  rpc AppendTaskLog(AppendTaskLogRequest) returns (AppendTaskLogResponse) {}
+  // TODO: UpdateTaskLog
+  // TODO: RemoveTaskLog
+}
+
+message ListTasksRequest {
+  optional string query = 3;
+  repeated int64 port_id = 1;
+  repeated harbour.types.v1.TaskStatus latest_status = 2;
+  repeated int64 assigned_user_id = 4;
+  harbour.types.v1.PaginationRequest pagination = 5;
+}
+
+message ListTasksResponse {
+  repeated TaskSummary results = 1;
+  harbour.types.v1.PaginationResponse pagination = 2;
+}
+
+message GetTaskRequest {
+  int64 task_id = 1;
+}
+
+message GetTaskResponse {
+  TaskDetails details = 1;
+}
+
+message CreateTaskRequest {
+  CreateTask info = 1;
+}
+
+message CreateTaskResponse {
+  int64 created_id = 1;
+}
+
+message AppendTaskLogRequest {
+  int64 task_id = 1;
+  AppendTaskLog info = 2;
+}
+
+message AppendTaskLogResponse {
+  int64 created_id = 1;
+}

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package harbour.container.v1;
+
+message CreateContainer {
+  string cin = 1;
+  int64 size_id = 2;
+  repeated int64 cargo_ids = 3;
+}

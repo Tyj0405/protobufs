@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package harbour.container.v1;
+
+message UpdateContainer {
+  optional string cin = 2;
+  optional int64 size_id = 3;
+
+  // Replaces the current container_cargos relationships.
+  repeated int64 cargo_ids = 4;
+}

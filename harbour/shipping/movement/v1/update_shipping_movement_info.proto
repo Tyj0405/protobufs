@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package harbour.shipping.movement.v1;
+
+message UpdateShippingMovementInfo {
+  optional int64 vessel_id = 1;
+  optional string remarks = 2;
+}

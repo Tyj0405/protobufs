@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package harbour.types.v1;
+
+message CargoContainer {
+  int64 id = 1;
+  string cin = 2;
+  ContainerStandardizedSize size = 3;
+}
+
+message ContainerStandardizedSize {
+  int64 id = 1;
+  int32 width_ft = 2;
+  int32 length_ft = 3;
+  int32 height_ft = 4;
+}

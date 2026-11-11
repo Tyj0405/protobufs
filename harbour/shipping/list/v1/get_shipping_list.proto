@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package harbour.shipping.list.v1;
+
+import "harbour/types/v1/cargo.proto";
+import "harbour/types/v1/shipping.proto";
+import "harbour/shipping/movement/v1/get_shipping_movement.proto";
+
+message ShippingListSummary {
+  harbour.types.v1.ShippingList info = 1;
+  repeated harbour.types.v1.CargoReference cargos = 2;
+  uint32 evidence_count = 3;
+}
+
+message ShippingListDetails {
+  harbour.types.v1.ShippingList info = 1;
+  repeated harbour.types.v1.ShippingListItem items = 2;
+  repeated harbour.shipping.movement.v1.ShippingMovementDetails movements = 3;
+}

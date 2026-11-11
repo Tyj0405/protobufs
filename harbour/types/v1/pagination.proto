@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package harbour.types.v1;
+
+message PaginationRequest {
+  uint32 page_size = 1;
+  optional string page_token = 2;
+}
+
+message PaginationResponse {
+  optional string next_page_token = 1;
+}

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package harbour.cargo.v1;
+
+message UpdateCargo {
+  optional string name = 1;
+  optional string description = 2;
+  optional double quantity = 3;
+  optional int64 unit_of_measure_id = 4;
+  optional double unit_height_m = 5;
+  optional double unit_width_m = 6;
+  optional double unit_length_m = 7;
+}

@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package harbour.types.v1;
+
+import "google/protobuf/timestamp.proto";
+import "harbour/types/v1/user.proto";
+
+message Notification {
+  int64 id = 1;
+  string title = 2;
+  string content = 3;
+  UserReference created_by = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+message NotificationDispatch {
+  UserReference user = 1;
+  bool is_important = 2;
+  google.protobuf.Timestamp sent_at = 3;
+  optional google.protobuf.Timestamp read_at = 4;
+}
+
+message UserNotification {
+  Notification notification = 1;
+  bool is_important = 2;
+  google.protobuf.Timestamp sent_at = 3;
+  optional google.protobuf.Timestamp read_at = 4;
+}

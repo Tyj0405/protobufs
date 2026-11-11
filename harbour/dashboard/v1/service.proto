@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+package harbour.dashboard.v1;
+
+import "google/protobuf/timestamp.proto";
+import "harbour/types/v1/pagination.proto";
+import "harbour/types/v1/location.proto";
+import "harbour/types/v1/task.proto";
+import "harbour/task/v1/get_task.proto";
+import "harbour/incident/v1/get_incident.proto";
+import "harbour/shipping/movement/v1/get_shipping_movement.proto";
+import "harbour/dashboard/v1/get_dashboard.proto";
+import "harbour/dashboard/v1/create_dashboard.proto";
+import "harbour/dashboard/v1/update_dashboard.proto";
+
+service UserDashboardService {
+  // Returns the current operational statistics and recent activities displayed
+  // by the dashboard UI.
+  rpc GetOperationalOverview(GetOperationalOverviewRequest) returns (GetOperationalOverviewResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Adds or removes a dashboard from the authenticated user's preferences.
+  rpc SetMyDashboardPreference(SetMyDashboardPreferenceRequest) returns (SetMyDashboardPreferenceResponse) {}
+}
+
+service DashboardService {
+  // Returns dashboards available for one port.
+  rpc ListDashboards(ListDashboardsRequest) returns (ListDashboardsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns one dashboard and its ordered layout components.
+  rpc GetDashboard(GetDashboardRequest) returns (GetDashboardResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Creates a dashboard and its initial layout for the authenticated user.
+  rpc CreateDashboard(CreateDashboardRequest) returns (CreateDashboardResponse) {}
+
+  // Updates the dashboard name and replaces its complete layout.
+  rpc UpdateDashboard(UpdateDashboardRequest) returns (UpdateDashboardResponse) {}
+
+  // Administrator operations for dashboards shared by default for a port.
+  rpc SetPortDefaultDashboardPreference(SetPortDefaultDashboardPreferenceRequest) returns (SetPortDefaultDashboardPreferenceResponse) {}
+}
+
+message GetOperationalOverviewRequest {
+  int64 port_id = 1;
+  optional uint32 number_of_recents = 2;
+}
+
+message GetOperationalOverviewResponse {
+  OperationalOverview overview = 1;
+}
+
+message ListDashboardsRequest {
+  optional string query = 1;
+  repeated int64 port_id = 2;
+  repeated int64 created_by_user_id = 3;
+  optional bool is_my_preference = 4;
+  optional bool is_port_default = 5;
+  harbour.types.v1.PaginationRequest pagination = 6;
+}
+
+message ListDashboardsResponse {
+  repeated DashboardSummary details = 1;
+  harbour.types.v1.PaginationResponse pagination = 2;
+}
+
+message GetDashboardRequest {
+  int64 id = 1;
+}
+
+message GetDashboardResponse {
+  DashboardDetails details = 1;
+}
+
+message CreateDashboardRequest {
+  CreateDashboard info = 1;
+}
+
+message CreateDashboardResponse {
+  int64 created_id = 1;
+}
+
+message UpdateDashboardRequest {
+  int64 id = 1;
+  UpdateDashboard info = 2;
+}
+
+message UpdateDashboardResponse {}
+
+message SetMyDashboardPreferenceRequest {
+  int64 id = 1;
+  bool state = 2;
+}
+
+message SetMyDashboardPreferenceResponse {}
+
+message SetPortDefaultDashboardPreferenceRequest {
+  int64 id = 1;
+  bool state = 2;
+}
+
+message SetPortDefaultDashboardPreferenceResponse {}
+
+// Current operational values used by the existing desktop dashboard.
+message OperationalOverview {
+  harbour.types.v1.LocationReference port = 1;
+  google.protobuf.Timestamp generated_at = 2;
+
+  // Open incidents are derived from the newest incident log.
+  uint64 open_incident_count = 3;
+  uint64 total_incident_count = 4;
+
+  // Active tasks are tasks whose newest log is Pending or Ongoing.
+  uint64 active_task_count = 5;
+  uint64 total_task_count = 6;
+
+  // The current schema does not link cargos or cargo movements directly to a
+  // port, so these two values are system-wide counts.
+  uint64 cargo_record_count = 7;
+  uint64 shipping_movement_count = 8;
+
+  repeated harbour.incident.v1.IncidentSummary recent_incidents = 9;
+  repeated TaskStatusCount task_status_counts = 10;
+  repeated harbour.shipping.movement.v1.ShippingMovementSummary latest_shipping_movements = 11;
+  repeated OperationalActivity recent_activities = 12;
+}
+
+message TaskStatusCount {
+  harbour.types.v1.TaskStatus status = 1;
+  uint64 count = 2;
+}
+
+message OperationalActivity {
+  oneof record {
+    harbour.incident.v1.IncidentSummary incident = 1;
+    harbour.task.v1.TaskSummary task = 2;
+    harbour.shipping.movement.v1.ShippingMovementSummary cargo_movement = 3;
+  }
+
+  google.protobuf.Timestamp occurred_at = 4;
+}
