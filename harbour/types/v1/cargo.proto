@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package harbour.types.v1;
+
+// Derived from the newest onloading/unloading record. This is not a database
+// enum or a cargos table column.
+enum CargoMovementStage {
+  CARGO_MOVEMENT_STAGE_UNSPECIFIED = 0;
+  CARGO_MOVEMENT_STAGE_REGISTERED = 1;
+  CARGO_MOVEMENT_STAGE_ONLOADING = 2;
+  CARGO_MOVEMENT_STAGE_UNLOADING = 3;
+}
+
+message UnitOfMeasure {
+  int64 id = 1;
+  string abbreviation = 2;
+  string description = 3;
+}
+
+message Cargo {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  double quantity = 4;
+  UnitOfMeasure unit_of_measure = 5;
+  double unit_height_m = 6;
+  double unit_width_m = 7;
+  double unit_length_m = 8;
+}
+
+message CargoReference {
+  int64 id = 1;
+  string name = 2;
+}
+
+

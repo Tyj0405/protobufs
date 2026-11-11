@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package harbour.task.v1;
+
+import "harbour/types/v1/task.proto";
+
+message AppendTaskLog {
+  harbour.types.v1.TaskStatus status = 1;
+  string description = 2;
+  optional string remarks = 3;
+}

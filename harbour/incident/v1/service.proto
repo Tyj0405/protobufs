@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package harbour.incident.v1;
+
+import "harbour/types/v1/pagination.proto";
+import "harbour/types/v1/incident.proto";
+import "harbour/incident/v1/get_incident.proto";
+import "harbour/incident/v1/create_incident.proto";
+import "harbour/incident/v1/append_incident_log.proto";
+
+service IncidentService {
+  // Returns incidents for the administrator list and staff mobile list.
+  rpc ListIncidents(ListIncidentsRequest) returns (ListIncidentsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns one incident together with its complete status-log history.
+  rpc GetIncident(GetIncidentRequest) returns (GetIncidentResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Creates an incident and its initial Open log for the authenticated user.
+  rpc CreateIncident(CreateIncidentRequest) returns (CreateIncidentResponse) {}
+  // TODO: UpdateIncident
+  // TODO: DeleteIncident
+
+  // Adds a new status log. The newest log becomes the latest incident status.
+  rpc AppendIncidentLog(AppendIncidentLogRequest) returns (AppendIncidentLogResponse) {}
+  // TODO: UpdateIncidentLog
+  // TODO: RemoveIncidentLog
+}
+
+message ListIncidentsRequest {
+  optional string query = 1;
+  repeated int64 port_id = 2;
+  repeated harbour.types.v1.IncidentStatus latest_status = 3;
+  repeated int64 created_by_user_id = 4;
+  harbour.types.v1.PaginationRequest pagination = 5;
+}
+
+message ListIncidentsResponse {
+  repeated IncidentSummary results = 1;
+  harbour.types.v1.PaginationResponse pagination = 2;
+}
+
+message GetIncidentRequest {
+  int64 id = 1;
+}
+
+message GetIncidentResponse {
+  IncidentDetails details = 1;
+}
+
+message CreateIncidentRequest {
+  CreateIncident info = 1;
+}
+
+message CreateIncidentResponse {
+  int64 created_id = 1;
+}
+
+message AppendIncidentLogRequest {
+  int64 id = 1;
+  AppendIncidentLog info = 2;
+}
+
+message AppendIncidentLogResponse {
+  int64 created_id = 1;
+}

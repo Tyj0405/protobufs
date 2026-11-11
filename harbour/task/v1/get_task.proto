@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package harbour.task.v1;
+
+import "harbour/types/v1/task.proto";
+
+message TaskSummary {
+  harbour.types.v1.Task info = 1;
+  harbour.types.v1.TaskStatus latest_status = 2;
+  uint32 evidence_count = 3;
+}
+
+message TaskDetails {
+  harbour.types.v1.Task info = 1;
+  repeated harbour.types.v1.TaskLog logs = 2;
+}

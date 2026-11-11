@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package harbour.types.v1;
+
+import "google/protobuf/timestamp.proto";
+import "harbour/types/v1/vessel.proto";
+import "harbour/types/v1/cargo.proto";
+import "harbour/types/v1/file.proto";
+import "harbour/types/v1/address.proto";
+import "harbour/types/v1/company.proto";
+import "harbour/types/v1/location.proto";
+
+message ShippingRoute {
+  int32 order_no = 1;
+  harbour.types.v1.AddressReference address = 2;
+  optional string callsign = 3;
+}
+
+message ShippingList {
+  int64 id = 1;
+  harbour.types.v1.LocationReference port = 2;
+  harbour.types.v1.CompanyReference company = 3;
+  harbour.types.v1.CompanyReference shipping_company = 4;
+  optional string remarks = 5;
+  google.protobuf.Timestamp created_at = 6;
+  repeated ShippingRoute routes = 7;
+}
+
+message ShippingListItem {
+  int64 id = 1;
+  harbour.types.v1.CargoReference cargo = 2;
+  optional string remarks = 3;
+  repeated harbour.types.v1.ImageEvidenceReference images = 4;
+}
+
+enum ShippingMovementType {
+  SHIPPING_MOVEMENT_TYPE_UNSPECIFIED = 0;
+  SHIPPING_MOVEMENT_TYPE_ONLOADING = 1;
+  SHIPPING_MOVEMENT_TYPE_UNLOADING = 2;
+}
+
+message ShippingMovement {
+  int64 id = 1;
+  ShippingMovementType movement_type = 2;
+  int64 shipping_label_id = 3;
+  harbour.types.v1.VesselReference vessel = 4;
+  optional string remarks = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message ShippingMovementItem {
+  int64 id = 1;
+  harbour.types.v1.CargoReference cargo = 2;
+  optional string remarks = 3;
+  repeated harbour.types.v1.ImageEvidenceReference images = 4;
+}

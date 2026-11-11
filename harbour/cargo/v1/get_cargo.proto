@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package harbour.cargo.v1;
+
+import "harbour/types/v1/cargo.proto";
+import "harbour/types/v1/company.proto";
+import "harbour/types/v1/container.proto";
+import "harbour/shipping/list/v1/get_shipping_list.proto";
+import "harbour/shipping/movement/v1/get_shipping_movement.proto";
+
+message CargoSummary {
+  harbour.types.v1.Cargo cargo = 1;
+  repeated harbour.types.v1.CompanyReference companies = 2;
+  repeated harbour.types.v1.CargoContainer containers = 3;
+  harbour.types.v1.CargoMovementStage latest_stage = 4;
+  optional harbour.shipping.movement.v1.ShippingMovementSummary latest_movement = 5;
+}
+
+message CargoDetails {
+  harbour.types.v1.Cargo cargo = 1;
+  repeated harbour.types.v1.CargoContainer containers = 2;
+  optional harbour.shipping.list.v1.ShippingListSummary shipping_list = 3;
+  repeated harbour.shipping.movement.v1.ShippingMovementSummary shipping_movements = 4;
+}

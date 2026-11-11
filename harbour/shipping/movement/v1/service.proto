@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package harbour.shipping.movement.v1;
+
+import "harbour/types/v1/pagination.proto";
+import "harbour/types/v1/shipping.proto";
+import "harbour/shipping/movement/v1/get_shipping_movement.proto";
+import "harbour/shipping/movement/v1/process_shipping_movement.proto";
+import "harbour/shipping/movement/v1/update_shipping_movement_info.proto";
+import "harbour/shipping/common/v1/update_shipping_item.proto";
+
+service ShippingMovementService {
+  rpc ListShippingMovements(ListShippingMovementsRequest) returns (ListShippingMovementsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc ProgressShippingMovement(ProgressShippingMovementRequest) returns (ProgressShippingMovementResponse) {}
+  rpc UpdateShippingMovementInfo(UpdateShippingMovementInfoRequest) returns (UpdateShippingMovementInfoResponse) {}
+  rpc RemoveShippingMovement(RemoveShippingMovementRequest) returns (RemoveShippingMovementResponse) {}
+  rpc UpdateShippingMovementItem(UpdateShippingMovementItemRequest) returns (UpdateShippingMovementItemResponse) {}
+  rpc RemoveShippingMovementItem(RemoveShippingMovementItemRequest) returns (RemoveShippingMovementItemResponse) {}
+  rpc RemoveShippingMovementItemImage(RemoveShippingMovementItemImageRequest) returns (RemoveShippingMovementItemImageResponse) {}
+}
+
+message ListShippingMovementsRequest {
+  repeated int64 id = 1;
+  repeated int64 port_id = 2;
+  repeated int64 company_id = 3;
+  repeated int64 shipping_company_id = 4;
+  repeated int64 cargo_id = 5;
+  repeated int64 vessel_id = 6;
+  harbour.types.v1.PaginationRequest pagination = 7;
+}
+
+message ListShippingMovementsResponse {
+  repeated ShippingMovementSummary results = 1;
+  harbour.types.v1.PaginationResponse pagination = 2;
+}
+
+message ProgressShippingMovementRequest {
+  int64 shipping_list_id = 1;
+  harbour.types.v1.ShippingMovementType movement_type = 2;
+  int64 vessel_id = 3;
+  optional string remarks = 4;
+  repeated AttachedShippingMovementItem items = 5;
+}
+
+message ProgressShippingMovementResponse {}
+
+message UpdateShippingMovementInfoRequest {
+  int64 shipping_list_id = 1;
+  harbour.types.v1.ShippingMovementType movement_type = 2;
+  UpdateShippingMovementInfo info = 3;
+}
+
+message UpdateShippingMovementInfoResponse {}
+
+message RemoveShippingMovementRequest {
+  int64 shipping_list_id = 1;
+  harbour.types.v1.ShippingMovementType movement_type = 2;
+}
+
+message RemoveShippingMovementResponse {}
+
+message UpdateShippingMovementItemRequest {
+  int64 id = 1;
+  harbour.types.v1.ShippingMovementType movement_type = 2;
+  harbour.shipping.common.v1.UpdateShippingItem item = 3;
+}
+
+message UpdateShippingMovementItemResponse {}
+
+message RemoveShippingMovementItemRequest {
+  int64 id = 1;
+  harbour.types.v1.ShippingMovementType movement_type = 2;
+}
+
+message RemoveShippingMovementItemResponse {}
+
+message RemoveShippingMovementItemImageRequest {
+  int64 item_id = 1;
+  int64 file_id = 2;
+  harbour.types.v1.ShippingMovementType movement_type = 3;
+}
+
+message RemoveShippingMovementItemImageResponse {}

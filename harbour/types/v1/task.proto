@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package harbour.types.v1;
+
+import "google/protobuf/timestamp.proto";
+import "harbour/types/v1/location.proto";
+import "harbour/types/v1/user.proto";
+
+enum TaskStatus {
+  TASK_STATUS_UNSPECIFIED = 0;
+  TASK_STATUS_PENDING = 1;
+  TASK_STATUS_ONGOING = 2;
+  TASK_STATUS_COMPLETED = 3;
+  TASK_STATUS_NOT_COMPLETED = 4;
+}
+
+message Task {
+  int64 id = 1;
+  UserReference assigned_user = 2;
+  LocationReference port = 3;
+  string name = 4;
+  string description = 5;
+
+  // start_at may be absent; end_at is required by the database.
+  google.protobuf.Timestamp start_at = 6;
+  google.protobuf.Timestamp end_at = 7;
+
+  UserReference created_by = 8;
+  google.protobuf.Timestamp created_at = 9;
+
+}
+
+message TaskLog {
+  int64 id = 1;
+  TaskStatus status = 2;
+  string description = 3;
+  optional string remarks = 4;
+  google.protobuf.Timestamp created_at = 5;
+}

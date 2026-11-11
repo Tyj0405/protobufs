@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package harbour.shipping.list.v1;
+
+import "harbour/shipping/list/v1/create_shipping_list.proto";
+import "harbour/shipping/list/v1/update_shipping_list_info.proto";
+import "harbour/shipping/common/v1/update_shipping_item.proto";
+import "harbour/shipping/list/v1/get_shipping_list.proto";
+import "harbour/types/v1/pagination.proto";
+
+service ShippingListService {
+  rpc ListShippingLists(ListShippingListsRequest) returns (ListShippingListsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc GetShippingList(GetShippingListRequest) returns (GetShippingListResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc CreateShippingList(CreateShippingListRequest) returns (CreateShippingListResponse) {}
+  rpc UpdateShippingListInfo(UpdateShippingListInfoRequest) returns (UpdateShippingListInfoResponse) {}
+  rpc DeleteShippingList(DeleteShippingListRequest) returns (DeleteShippingListResponse) {}
+  rpc UpdateShippingListItem(UpdateShippingListItemRequest) returns (UpdateShippingListItemResponse) {}
+  rpc RemoveShippingListItem(RemoveShippingListItemRequest) returns (RemoveShippingListItemResponse) {}
+  rpc RemoveShippingListItemImage(RemoveShippingListItemImageRequest) returns (RemoveShippingListItemImageResponse) {}
+}
+
+message ListShippingListsRequest {
+  repeated int64 id = 1;
+  repeated int64 port_id = 2;
+  repeated int64 company_id = 3;
+  repeated int64 shipping_company_id = 4;
+  repeated int64 cargo_id = 5;
+  harbour.types.v1.PaginationRequest pagination = 7;
+}
+
+message ListShippingListsResponse {
+  repeated ShippingListSummary results = 1;
+  harbour.types.v1.PaginationResponse pagination = 2;
+}
+
+message GetShippingListRequest {
+  int64 shipping_list_id = 1;
+}
+
+message GetShippingListResponse {
+  ShippingListDetails shipping_list = 1;
+}
+
+message CreateShippingListRequest {
+  CreateShippingListInfo info = 1;
+}
+
+message CreateShippingListResponse {
+  int64 created_id = 1;
+}
+
+message UpdateShippingListInfoRequest {
+  int64 id = 1;
+  UpdateShippingListInfo info = 2;
+}
+
+message UpdateShippingListInfoResponse {}
+
+message DeleteShippingListRequest {
+  int64 id = 1;
+}
+
+message DeleteShippingListResponse {}
+
+message UpdateShippingListItemRequest {
+  int64 id = 1;
+  harbour.shipping.common.v1.UpdateShippingItem item = 2;
+}
+
+message UpdateShippingListItemResponse {}
+
+message RemoveShippingListItemRequest {
+  int64 id = 1;
+}
+
+message RemoveShippingListItemResponse {}
+
+message RemoveShippingListItemImageRequest {
+  int64 item_id = 1;
+  int64 file_id = 2;
+}
+
+message RemoveShippingListItemImageResponse {}

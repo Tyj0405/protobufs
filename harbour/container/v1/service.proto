@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package harbour.container.v1;
+
+import "harbour/types/v1/pagination.proto";
+import "harbour/types/v1/container.proto";
+import "harbour/container/v1/get_container.proto";
+import "harbour/container/v1/create_container.proto";
+import "harbour/container/v1/update_container.proto";
+
+service ContainerService {
+  rpc ListContainers(ListContainersRequest) returns (ListContainersResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc GetContainer(GetContainerRequest) returns (GetContainerResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc CreateContainer(CreateContainerRequest) returns (CreateContainerResponse) {}
+  rpc UpdateContainer(UpdateContainerRequest) returns (UpdateContainerResponse) {}
+  // TODO: RemoveContainer
+
+  rpc ListContainerSizes(ListContainerSizesRequest) returns (ListContainerSizesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message ListContainersRequest {
+  optional string query = 1;
+  repeated int64 size_id = 2;
+  repeated int64 cargo_id = 3;
+  harbour.types.v1.PaginationRequest pagination = 4;
+}
+
+message ListContainersResponse {
+  repeated CargoContainerSummary results = 1;
+  harbour.types.v1.PaginationResponse pagination = 2;
+}
+
+message GetContainerRequest {
+  int64 container_id = 1;
+}
+
+message GetContainerResponse {
+  CargoContainerDetails details = 1;
+}
+
+message CreateContainerRequest {
+  CreateContainer info = 1;
+}
+
+message CreateContainerResponse {
+  int64 created_id = 1;
+}
+
+message UpdateContainerRequest {
+  int64 id = 1;
+  UpdateContainer info = 2;
+}
+
+message UpdateContainerResponse {}
+
+message ListContainerSizesRequest {}
+
+message ListContainerSizesResponse {
+  repeated harbour.types.v1.ContainerStandardizedSize results = 1;
+}

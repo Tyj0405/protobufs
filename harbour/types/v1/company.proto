@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package harbour.types.v1;
+
+message CompanyReference {
+  int64 id = 1;
+  string name = 2;
+}

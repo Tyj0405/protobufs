@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package harbour.types.v1;
+
+import "google/protobuf/timestamp.proto";
+import "harbour/types/v1/location.proto";
+import "harbour/types/v1/user.proto";
+import "harbour/types/v1/file.proto";
+
+enum IncidentStatus {
+  INCIDENT_STATUS_UNSPECIFIED = 0;
+  INCIDENT_STATUS_OPEN = 1;
+  INCIDENT_STATUS_INVESTIGATING = 2;
+  INCIDENT_STATUS_RESOLVING = 3;
+  INCIDENT_STATUS_RESOLVED = 4;
+  INCIDENT_STATUS_NOT_PLANNED = 5;
+}
+
+message Incident {
+  int64 id = 1;
+  string description = 2;
+  LocationReference port = 3;
+
+  oneof specific_location {
+    LocationReference berth = 4;
+    LocationReference wharf = 5;
+    LocationReference terminal = 6;
+  }
+
+  UserReference created_by = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message IncidentLog {
+  int64 id = 1;
+  IncidentStatus status = 2;
+  string description = 3;
+  optional string remarks = 4;
+  google.protobuf.Timestamp created_at = 5;
+  repeated ImageEvidenceReference images = 6;
+}
