@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package harbour.dashboard.v1;
+
+import "harbour/dashboard/v1/create_dashboard.proto";
+
+message UpdateDashboard {
+  optional string name = 1;
+  optional int64 port_id = 2;
+
+  // This list is the complete desired layout. Components omitted from the list
+  // are removed, and the position values define the new display order.
+  repeated DashboardLayoutInput layouts = 3;
+}

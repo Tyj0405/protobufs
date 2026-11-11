@@ -2,8 +2,10 @@ syntax = "proto3";
 
 package harbour.notification.v1;
 
-import "google/protobuf/timestamp.proto";
-import "harbour/common/v1/common.proto";
+import "harbour/types/v1/pagination.proto";
+import "harbour/types/v1/notification.proto";
+import "harbour/notification/v1/get_notification.proto";
+import "harbour/notification/v1/dispatch_notification.proto";
 
 // UserNotificationService contains operations available to an authenticated
 // notification recipient.
@@ -42,31 +44,29 @@ message ListMyNotificationsRequest {
   // When present, returns only read or only unread notifications.
   optional bool read = 1;
   optional bool is_important = 2;
-  .harbour.common.v1.PaginationRequest pagination = 3;
+  harbour.types.v1.PaginationRequest pagination = 3;
 }
 
 message ListMyNotificationsResponse {
-  repeated UserNotification notifications = 1;
-  .harbour.common.v1.PaginationResponse pagination = 2;
+  repeated harbour.types.v1.UserNotification results = 1;
+  harbour.types.v1.PaginationResponse pagination = 2;
 }
 
 message MarkNotificationReadRequest {
   int64 notification_id = 1;
 }
 
-message MarkNotificationReadResponse {
-  UserNotification notification = 1;
-}
+message MarkNotificationReadResponse {}
 
 message ListNotificationsRequest {
   optional string query = 1;
-  optional int64 created_by_user_id = 2;
-  .harbour.common.v1.PaginationRequest pagination = 3;
+  repeated int64 created_by_user_id = 2;
+  harbour.types.v1.PaginationRequest pagination = 3;
 }
 
 message ListNotificationsResponse {
   repeated NotificationSummary notifications = 1;
-  .harbour.common.v1.PaginationResponse pagination = 2;
+  harbour.types.v1.PaginationResponse pagination = 2;
 }
 
 message GetNotificationRequest {
@@ -87,7 +87,7 @@ message CreateNotificationRequest {
 }
 
 message CreateNotificationResponse {
-  NotificationDetails details = 1;
+  int64 created_id = 1;
 }
 
 message DispatchNotificationRequest {
@@ -98,55 +98,4 @@ message DispatchNotificationRequest {
   repeated NotificationRecipient recipients = 2;
 }
 
-message DispatchNotificationResponse {
-  NotificationDetails details = 1;
-}
-
-// The shared notification content stored in the notifications table.
-message Notification {
-  int64 id = 1;
-  string title = 2;
-  string content = 3;
-  .harbour.common.v1.UserReference created_by = 4;
-  google.protobuf.Timestamp created_at = 5;
-}
-
-// A compact admin list item. Dispatch counts are derived from
-// notification_dispatches and are not additional notification columns.
-message NotificationSummary {
-  Notification notification = 1;
-  uint32 recipient_count = 2;
-  uint32 read_count = 3;
-}
-
-// Admin management details for one notification.
-message NotificationDetails {
-  Notification notification = 1;
-  repeated NotificationDispatch dispatches = 2;
-}
-
-// The user-facing notification together with that user's dispatch state.
-message UserNotification {
-  Notification notification = 1;
-  bool is_important = 2;
-  google.protobuf.Timestamp sent_at = 3;
-
-  // Absent means the notification has not been read.
-  google.protobuf.Timestamp read_at = 4;
-}
-
-// Admin-facing state for one notification recipient.
-message NotificationDispatch {
-  .harbour.common.v1.UserReference user = 1;
-  bool is_important = 2;
-  google.protobuf.Timestamp sent_at = 3;
-
-  // Absent means the recipient has not read the notification.
-  google.protobuf.Timestamp read_at = 4;
-}
-
-// Input used by both CreateNotification and DispatchNotification.
-message NotificationRecipient {
-  int64 user_id = 1;
-  bool is_important = 2;
-}
+message DispatchNotificationResponse {}

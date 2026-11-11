@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package harbour.notification.v1;
+
+import "harbour/types/v1/notification.proto";
+
+message NotificationSummary {
+  harbour.types.v1.Notification notification = 1;
+  uint32 recipient_count = 2;
+  uint32 read_count = 3;
+}
+
+message NotificationDetails {
+  harbour.types.v1.Notification notification = 1;
+  repeated harbour.types.v1.NotificationDispatch dispatches = 2;
+}

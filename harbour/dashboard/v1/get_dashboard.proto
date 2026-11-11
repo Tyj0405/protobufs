@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package harbour.dashboard.v1;
+
+import "harbour/types/v1/dashboard.proto";
+
+message DashboardSummary {
+  harbour.types.v1.Dashboard info = 1;
+  // Derived from the two preference relationship tables for the current caller
+  // and the dashboard's port.
+  bool is_my_preference = 2;
+  bool is_port_default = 3;
+}
+
+message DashboardDetails {
+  harbour.types.v1.Dashboard dashboard = 1;
+  repeated harbour.types.v1.DashboardLayout layouts = 2;
+  bool is_my_preference = 3;
+  bool is_port_default = 4;
+}

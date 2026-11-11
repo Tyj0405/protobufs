@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package harbour.dashboard.v1;
+
+import "google/protobuf/struct.proto";
+
+message CreateDashboard {
+  string name = 1;
+  int64 port_id = 2;
+  repeated DashboardLayoutInput layouts = 3;
+}
+
+message DashboardLayoutInput {
+  int64 component_id = 1;
+  string title = 2;
+  uint32 position = 3;
+  google.protobuf.Struct data = 4;
+}
