@@ -86,7 +86,7 @@ enum TaskStatus {
   TASK_STATUS_PENDING = 1;
   TASK_STATUS_ONGOING = 2;
   TASK_STATUS_COMPLETED = 3;
-  TASK_STATUS_NOT_COMPLETED = 4;
+  TASK_STATUS_INCOMPLETE = 4;
 }
 
 message Task {
@@ -118,4 +118,5 @@ message TaskLog {
   string description = 3;
   optional string remarks = 4;
   google.protobuf.Timestamp created_at = 5;
+  .harbour.common.v1.UserReference created_by = 6;
 }
