@@ -1,0 +1,227 @@
+syntax = "proto3";
+
+package harbour.dashboard.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "harbour/cargo/v1/cargo.proto";
+import "harbour/common/v1/common.proto";
+import "harbour/incident/v1/incident.proto";
+import "harbour/task/v1/task.proto";
+
+// DashboardService supports the operational overview and customizable
+// dashboards used by staff and administrators.
+service DashboardService {
+  // Returns the current operational statistics and recent activities displayed
+  // by the dashboard UI.
+  rpc GetOperationalOverview(GetOperationalOverviewRequest) returns (GetOperationalOverviewResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns dashboards available for one port.
+  rpc ListDashboards(ListDashboardsRequest) returns (ListDashboardsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns one dashboard and its ordered layout components.
+  rpc GetDashboard(GetDashboardRequest) returns (GetDashboardResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Creates a dashboard and its initial layout for the authenticated user.
+  rpc CreateDashboard(CreateDashboardRequest) returns (CreateDashboardResponse) {}
+
+  // Updates the dashboard name and replaces its complete layout.
+  rpc UpdateDashboard(UpdateDashboardRequest) returns (UpdateDashboardResponse) {}
+
+  // Returns the available component definitions that may be added to a layout.
+  rpc ListDashboardComponents(ListDashboardComponentsRequest) returns (ListDashboardComponentsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Adds or removes a dashboard from the authenticated user's preferences.
+  rpc AddMyDashboardPreference(AddMyDashboardPreferenceRequest) returns (AddMyDashboardPreferenceResponse) {}
+  rpc RemoveMyDashboardPreference(RemoveMyDashboardPreferenceRequest) returns (RemoveMyDashboardPreferenceResponse) {}
+
+  // Administrator operations for dashboards shared by default for a port.
+  rpc AddPortDefaultDashboardPreference(AddPortDefaultDashboardPreferenceRequest) returns (AddPortDefaultDashboardPreferenceResponse) {}
+  rpc RemovePortDefaultDashboardPreference(RemovePortDefaultDashboardPreferenceRequest) returns (RemovePortDefaultDashboardPreferenceResponse) {}
+}
+
+message GetOperationalOverviewRequest {
+  int64 port_id = 1;
+
+  // Limits each recent-record collection. Zero lets the backend use its
+  // configured default.
+  uint32 recent_item_limit = 2;
+}
+
+message GetOperationalOverviewResponse {
+  OperationalOverview overview = 1;
+}
+
+message ListDashboardsRequest {
+  int64 port_id = 1;
+  optional string query = 2;
+  optional int64 created_by_user_id = 3;
+  optional bool is_my_preference = 4;
+  optional bool is_port_default = 5;
+  .harbour.common.v1.PaginationRequest pagination = 6;
+}
+
+message ListDashboardsResponse {
+  repeated DashboardSummary dashboards = 1;
+  .harbour.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetDashboardRequest {
+  int64 dashboard_id = 1;
+}
+
+message GetDashboardResponse {
+  DashboardDetails details = 1;
+}
+
+message CreateDashboardRequest {
+  string name = 1;
+  int64 port_id = 2;
+  repeated DashboardLayoutInput layouts = 3;
+}
+
+message CreateDashboardResponse {
+  DashboardDetails details = 1;
+}
+
+message UpdateDashboardRequest {
+  int64 dashboard_id = 1;
+  string name = 2;
+
+  // This list is the complete desired layout. Components omitted from the list
+  // are removed, and the position values define the new display order.
+  repeated DashboardLayoutInput layouts = 3;
+}
+
+message UpdateDashboardResponse {
+  DashboardDetails details = 1;
+}
+
+message ListDashboardComponentsRequest {
+  optional string query = 1;
+}
+
+message ListDashboardComponentsResponse {
+  repeated DashboardComponent components = 1;
+}
+
+message AddMyDashboardPreferenceRequest {
+  int64 dashboard_id = 1;
+}
+
+message AddMyDashboardPreferenceResponse {
+  DashboardSummary dashboard = 1;
+}
+
+message RemoveMyDashboardPreferenceRequest {
+  int64 dashboard_id = 1;
+}
+
+message RemoveMyDashboardPreferenceResponse {}
+
+message AddPortDefaultDashboardPreferenceRequest {
+  int64 port_id = 1;
+  int64 dashboard_id = 2;
+}
+
+message AddPortDefaultDashboardPreferenceResponse {
+  DashboardSummary dashboard = 1;
+}
+
+message RemovePortDefaultDashboardPreferenceRequest {
+  int64 port_id = 1;
+  int64 dashboard_id = 2;
+}
+
+message RemovePortDefaultDashboardPreferenceResponse {}
+
+// Current operational values used by the existing desktop dashboard.
+message OperationalOverview {
+  .harbour.common.v1.LocationReference port = 1;
+  google.protobuf.Timestamp generated_at = 2;
+
+  // Open incidents are derived from the newest incident log.
+  uint64 open_incident_count = 3;
+  uint64 total_incident_count = 4;
+
+  // Active tasks are tasks whose newest log is Pending or Ongoing.
+  uint64 active_task_count = 5;
+  uint64 total_task_count = 6;
+
+  // The current schema does not link cargos or cargo movements directly to a
+  // port, so these two values are system-wide counts.
+  uint64 cargo_record_count = 7;
+  uint64 cargo_movement_count = 8;
+
+  repeated .harbour.incident.v1.Incident recent_incidents = 9;
+  repeated TaskStatusCount task_status_counts = 10;
+  repeated .harbour.cargo.v1.CargoMovementSummary latest_cargo_movements = 11;
+  repeated OperationalActivity recent_activities = 12;
+}
+
+message TaskStatusCount {
+  .harbour.task.v1.TaskStatus status = 1;
+  uint64 count = 2;
+}
+
+// One item in the combined daily operational activity stream.
+message OperationalActivity {
+  oneof record {
+    .harbour.incident.v1.Incident incident = 1;
+    .harbour.task.v1.Task task = 2;
+    .harbour.cargo.v1.CargoMovementSummary cargo_movement = 3;
+  }
+
+  google.protobuf.Timestamp occurred_at = 4;
+}
+
+message DashboardSummary {
+  int64 id = 1;
+  string name = 2;
+  .harbour.common.v1.LocationReference port = 3;
+  .harbour.common.v1.UserReference created_by = 4;
+
+  // Derived from the two preference relationship tables for the current caller
+  // and the dashboard's port.
+  bool is_my_preference = 5;
+  bool is_port_default = 6;
+}
+
+message DashboardDetails {
+  DashboardSummary dashboard = 1;
+  repeated DashboardLayout layouts = 2;
+}
+
+message DashboardComponent {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message DashboardLayout {
+  int64 id = 1;
+  DashboardComponent component = 2;
+  string title = 3;
+
+  // The database has no dedicated order column. The backend stores this value
+  // in dashboard_layouts.data and returns layouts sorted by it.
+  uint32 position = 4;
+
+  // Component-specific options stored in dashboard_layouts.data.
+  google.protobuf.Struct data = 5;
+}
+
+message DashboardLayoutInput {
+  int64 component_id = 1;
+  string title = 2;
+  uint32 position = 3;
+  google.protobuf.Struct data = 4;
+}
