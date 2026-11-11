@@ -1,36 +1,40 @@
- syntax = "proto3";
+syntax = "proto3";
 
 package harbour.notification.v1;
 
 import "google/protobuf/timestamp.proto";
 import "harbour/common/v1/common.proto";
 
-// NotificationService separates the user inbox workflow from the administrator
-// notification management workflow.
-service NotificationService {
-  // User side: returns notifications dispatched to the authenticated user.
+// UserNotificationService contains operations available to an authenticated
+// notification recipient.
+service UserNotificationService {
+  // Returns notifications dispatched to the authenticated user.
   rpc ListMyNotifications(ListMyNotificationsRequest) returns (ListMyNotificationsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  // User side: marks one of the authenticated user's notifications as read.
+  // Marks one of the authenticated user's notifications as read.
   rpc MarkNotificationRead(MarkNotificationReadRequest) returns (MarkNotificationReadResponse) {}
+}
 
-  // Admin side: returns notifications created for management purposes.
+// AdminNotificationService contains notification management operations that
+// require administrator access.
+service AdminNotificationService {
+  // Returns notifications created for management purposes.
   rpc ListNotifications(ListNotificationsRequest) returns (ListNotificationsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  // Admin side: returns one notification and all of its dispatch records.
+  // Returns one notification and all of its dispatch records.
   rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  // Admin side: creates a notification and dispatches it to the first group of
-  // recipients in one operation.
+  // Creates a notification and dispatches it to the first group of recipients
+  // in one operation.
   rpc CreateNotification(CreateNotificationRequest) returns (CreateNotificationResponse) {}
 
-  // Admin side: dispatches an existing notification to additional users.
+  // Dispatches an existing notification to additional users.
   rpc DispatchNotification(DispatchNotificationRequest) returns (DispatchNotificationResponse) {}
 }
 
