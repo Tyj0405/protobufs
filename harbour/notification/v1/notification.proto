@@ -1,0 +1,148 @@
+ syntax = "proto3";
+
+package harbour.notification.v1;
+
+import "google/protobuf/timestamp.proto";
+import "harbour/common/v1/common.proto";
+
+// NotificationService separates the user inbox workflow from the administrator
+// notification management workflow.
+service NotificationService {
+  // User side: returns notifications dispatched to the authenticated user.
+  rpc ListMyNotifications(ListMyNotificationsRequest) returns (ListMyNotificationsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // User side: marks one of the authenticated user's notifications as read.
+  rpc MarkNotificationRead(MarkNotificationReadRequest) returns (MarkNotificationReadResponse) {}
+
+  // Admin side: returns notifications created for management purposes.
+  rpc ListNotifications(ListNotificationsRequest) returns (ListNotificationsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Admin side: returns one notification and all of its dispatch records.
+  rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Admin side: creates a notification and dispatches it to the first group of
+  // recipients in one operation.
+  rpc CreateNotification(CreateNotificationRequest) returns (CreateNotificationResponse) {}
+
+  // Admin side: dispatches an existing notification to additional users.
+  rpc DispatchNotification(DispatchNotificationRequest) returns (DispatchNotificationResponse) {}
+}
+
+message ListMyNotificationsRequest {
+  // When present, returns only read or only unread notifications.
+  optional bool read = 1;
+  optional bool is_important = 2;
+  .harbour.common.v1.PaginationRequest pagination = 3;
+}
+
+message ListMyNotificationsResponse {
+  repeated UserNotification notifications = 1;
+  .harbour.common.v1.PaginationResponse pagination = 2;
+}
+
+message MarkNotificationReadRequest {
+  int64 notification_id = 1;
+}
+
+message MarkNotificationReadResponse {
+  UserNotification notification = 1;
+}
+
+message ListNotificationsRequest {
+  optional string query = 1;
+  optional int64 created_by_user_id = 2;
+  .harbour.common.v1.PaginationRequest pagination = 3;
+}
+
+message ListNotificationsResponse {
+  repeated NotificationSummary notifications = 1;
+  .harbour.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetNotificationRequest {
+  int64 notification_id = 1;
+}
+
+message GetNotificationResponse {
+  NotificationDetails details = 1;
+}
+
+message CreateNotificationRequest {
+  string title = 1;
+  string content = 2;
+
+  // The first group of users who should receive the notification. The backend
+  // creates both the notification and these dispatch records transactionally.
+  repeated NotificationRecipient recipients = 3;
+}
+
+message CreateNotificationResponse {
+  NotificationDetails details = 1;
+}
+
+message DispatchNotificationRequest {
+  int64 notification_id = 1;
+
+  // Additional recipients. A user who already received this notification must
+  // not be inserted again because the database uses a composite primary key.
+  repeated NotificationRecipient recipients = 2;
+}
+
+message DispatchNotificationResponse {
+  NotificationDetails details = 1;
+}
+
+// The shared notification content stored in the notifications table.
+message Notification {
+  int64 id = 1;
+  string title = 2;
+  string content = 3;
+  .harbour.common.v1.UserReference created_by = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+// A compact admin list item. Dispatch counts are derived from
+// notification_dispatches and are not additional notification columns.
+message NotificationSummary {
+  Notification notification = 1;
+  uint32 recipient_count = 2;
+  uint32 read_count = 3;
+}
+
+// Admin management details for one notification.
+message NotificationDetails {
+  Notification notification = 1;
+  repeated NotificationDispatch dispatches = 2;
+}
+
+// The user-facing notification together with that user's dispatch state.
+message UserNotification {
+  Notification notification = 1;
+  bool is_important = 2;
+  google.protobuf.Timestamp sent_at = 3;
+
+  // Absent means the notification has not been read.
+  google.protobuf.Timestamp read_at = 4;
+}
+
+// Admin-facing state for one notification recipient.
+message NotificationDispatch {
+  .harbour.common.v1.UserReference user = 1;
+  bool is_important = 2;
+  google.protobuf.Timestamp sent_at = 3;
+
+  // Absent means the recipient has not read the notification.
+  google.protobuf.Timestamp read_at = 4;
+}
+
+// Input used by both CreateNotification and DispatchNotification.
+message NotificationRecipient {
+  int64 user_id = 1;
+  bool is_important = 2;
+}
