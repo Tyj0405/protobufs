@@ -1,0 +1,434 @@
+syntax = "proto3";
+
+package harbour.cargo.v1;
+
+import "google/protobuf/timestamp.proto";
+import "harbour/common/v1/common.proto";
+
+// CargoService supports the administrator desktop cargo workflow and the staff
+// mobile onloading/unloading workflow.
+service CargoService {
+  // Cargo records.
+  rpc ListCargos(ListCargosRequest) returns (ListCargosResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc GetCargo(GetCargoRequest) returns (GetCargoResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc CreateCargo(CreateCargoRequest) returns (CreateCargoResponse) {}
+  rpc UpdateCargo(UpdateCargoRequest) returns (UpdateCargoResponse) {}
+
+  // Containers and container-to-cargo relationships.
+  rpc ListContainers(ListContainersRequest) returns (ListContainersResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc GetContainer(GetContainerRequest) returns (GetContainerResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc CreateContainer(CreateContainerRequest) returns (CreateContainerResponse) {}
+  rpc UpdateContainer(UpdateContainerRequest) returns (UpdateContainerResponse) {}
+
+  // Shipping labels, ordered routes, cargo items, and item evidence.
+  rpc ListShippingLabels(ListShippingLabelsRequest) returns (ListShippingLabelsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc GetShippingLabel(GetShippingLabelRequest) returns (GetShippingLabelResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc CreateShippingLabel(CreateShippingLabelRequest) returns (CreateShippingLabelResponse) {}
+  rpc UpdateShippingLabel(UpdateShippingLabelRequest) returns (UpdateShippingLabelResponse) {}
+
+  // Read and record onloading/unloading history.
+  rpc ListCargoMovements(ListCargoMovementsRequest) returns (ListCargoMovementsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc GetCargoMovement(GetCargoMovementRequest) returns (GetCargoMovementResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc RecordCargoMovement(RecordCargoMovementRequest) returns (RecordCargoMovementResponse) {}
+
+  // Reference data required by registration forms.
+  rpc ListUnitOfMeasures(ListUnitOfMeasuresRequest) returns (ListUnitOfMeasuresResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc ListContainerSizes(ListContainerSizesRequest) returns (ListContainerSizesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message ListCargosRequest {
+  optional string query = 1;
+  optional int64 unit_of_measure_id = 2;
+  optional int64 company_id = 3;
+  optional int64 vessel_id = 4;
+  optional int64 container_id = 5;
+
+  // A derived filter. Cargo has no status column in the database.
+  optional CargoMovementStage latest_stage = 6;
+  .harbour.common.v1.PaginationRequest pagination = 7;
+}
+
+message ListCargosResponse {
+  repeated CargoSummary cargos = 1;
+  .harbour.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetCargoRequest {
+  int64 cargo_id = 1;
+}
+
+message GetCargoResponse {
+  CargoDetails details = 1;
+}
+
+message CreateCargoRequest {
+  string name = 1;
+  string description = 2;
+  double quantity = 3;
+  int64 unit_of_measure_id = 4;
+  double unit_height_m = 5;
+  double unit_width_m = 6;
+  double unit_length_m = 7;
+}
+
+message CreateCargoResponse {
+  CargoDetails details = 1;
+}
+
+message UpdateCargoRequest {
+  int64 cargo_id = 1;
+  string name = 2;
+  string description = 3;
+  double quantity = 4;
+  int64 unit_of_measure_id = 5;
+  double unit_height_m = 6;
+  double unit_width_m = 7;
+  double unit_length_m = 8;
+}
+
+message UpdateCargoResponse {
+  CargoDetails details = 1;
+}
+
+message ListContainersRequest {
+  optional string query = 1;
+  optional int64 size_id = 2;
+  optional int64 cargo_id = 3;
+  .harbour.common.v1.PaginationRequest pagination = 4;
+}
+
+message ListContainersResponse {
+  repeated CargoContainer containers = 1;
+  .harbour.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetContainerRequest {
+  int64 container_id = 1;
+}
+
+message GetContainerResponse {
+  CargoContainer container = 1;
+}
+
+message CreateContainerRequest {
+  string cin = 1;
+  int64 size_id = 2;
+  repeated int64 cargo_ids = 3;
+}
+
+message CreateContainerResponse {
+  CargoContainer container = 1;
+}
+
+message UpdateContainerRequest {
+  int64 container_id = 1;
+  string cin = 2;
+  int64 size_id = 3;
+
+  // Replaces the current container_cargos relationships.
+  repeated int64 cargo_ids = 4;
+}
+
+message UpdateContainerResponse {
+  CargoContainer container = 1;
+}
+
+message ListShippingLabelsRequest {
+  optional string query = 1;
+  optional int64 company_id = 2;
+  optional int64 shipping_company_id = 3;
+  optional int64 cargo_id = 4;
+  .harbour.common.v1.PaginationRequest pagination = 5;
+}
+
+message ListShippingLabelsResponse {
+  repeated ShippingLabelSummary shipping_labels = 1;
+  .harbour.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetShippingLabelRequest {
+  int64 shipping_label_id = 1;
+}
+
+message GetShippingLabelResponse {
+  ShippingLabel shipping_label = 1;
+}
+
+message CreateShippingLabelRequest {
+  int64 company_id = 1;
+  int64 shipping_company_id = 2;
+  optional string remarks = 3;
+  repeated ShippingRouteInput routes = 4;
+  repeated ShippingListItemInput items = 5;
+}
+
+message CreateShippingLabelResponse {
+  ShippingLabel shipping_label = 1;
+}
+
+message UpdateShippingLabelRequest {
+  int64 shipping_label_id = 1;
+  int64 company_id = 2;
+  int64 shipping_company_id = 3;
+  optional string remarks = 4;
+
+  // Replaces the current routes and list items.
+  repeated ShippingRouteInput routes = 5;
+  repeated ShippingListItemInput items = 6;
+}
+
+message UpdateShippingLabelResponse {
+  ShippingLabel shipping_label = 1;
+}
+
+message ListCargoMovementsRequest {
+  optional int64 cargo_id = 1;
+  optional int64 shipping_label_id = 2;
+  optional int64 vessel_id = 3;
+  optional CargoMovementType movement_type = 4;
+  .harbour.common.v1.PaginationRequest pagination = 5;
+}
+
+message ListCargoMovementsResponse {
+  repeated CargoMovementSummary movements = 1;
+  .harbour.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetCargoMovementRequest {
+  // Onloading and unloading IDs come from different tables, so the type is
+  // required together with the ID.
+  int64 movement_id = 1;
+  CargoMovementType movement_type = 2;
+}
+
+message GetCargoMovementResponse {
+  CargoMovement movement = 1;
+}
+
+message RecordCargoMovementRequest {
+  CargoMovementType movement_type = 1;
+  int64 shipping_label_id = 2;
+  int64 vessel_id = 3;
+  optional string remarks = 4;
+  repeated CargoMovementItemInput items = 5;
+}
+
+message RecordCargoMovementResponse {
+  CargoMovement movement = 1;
+  repeated CargoSummary affected_cargos = 2;
+}
+
+message ListUnitOfMeasuresRequest {}
+
+message ListUnitOfMeasuresResponse {
+  repeated UnitOfMeasureReference unit_of_measures = 1;
+}
+
+message ListContainerSizesRequest {}
+
+message ListContainerSizesResponse {
+  repeated ContainerStandardizedSize container_sizes = 1;
+}
+
+enum CargoMovementType {
+  CARGO_MOVEMENT_TYPE_UNSPECIFIED = 0;
+  CARGO_MOVEMENT_TYPE_ONLOADING = 1;
+  CARGO_MOVEMENT_TYPE_UNLOADING = 2;
+}
+
+// Derived from the newest onloading/unloading record. This is not a database
+// enum or a cargos table column.
+enum CargoMovementStage {
+  CARGO_MOVEMENT_STAGE_UNSPECIFIED = 0;
+  CARGO_MOVEMENT_STAGE_REGISTERED = 1;
+  CARGO_MOVEMENT_STAGE_ONLOADING = 2;
+  CARGO_MOVEMENT_STAGE_UNLOADING = 3;
+}
+
+message Cargo {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  double quantity = 4;
+  UnitOfMeasureReference unit_of_measure = 5;
+  double unit_height_m = 6;
+  double unit_width_m = 7;
+  double unit_length_m = 8;
+}
+
+message CargoReference {
+  int64 id = 1;
+  string name = 2;
+}
+
+message CargoSummary {
+  Cargo cargo = 1;
+
+  // Derived through shipping_list_items and shipping_labels.
+  repeated CompanyReference companies = 2;
+
+  // Derived through container_cargos.
+  repeated ContainerReference containers = 3;
+
+  CargoMovementStage latest_stage = 4;
+
+  // Absent when latest_stage is REGISTERED.
+  CargoMovementSummary latest_movement = 5;
+}
+
+message CargoDetails {
+  CargoSummary summary = 1;
+  repeated CargoContainer containers = 2;
+  repeated ShippingLabel shipping_labels = 3;
+  repeated CargoMovement movements = 4;
+}
+
+message UnitOfMeasureReference {
+  int64 id = 1;
+  string abbreviation = 2;
+  string description = 3;
+}
+
+message ContainerStandardizedSize {
+  int64 id = 1;
+  int32 width_ft = 2;
+  int32 length_ft = 3;
+  int32 height_ft = 4;
+}
+
+message ContainerReference {
+  int64 id = 1;
+  string cin = 2;
+  ContainerStandardizedSize size = 3;
+}
+
+message CargoContainer {
+  ContainerReference container = 1;
+  repeated CargoReference cargos = 2;
+}
+
+message ShippingLabelSummary {
+  int64 id = 1;
+  CompanyReference company = 2;
+  CompanyReference shipping_company = 3;
+  optional string remarks = 4;
+  google.protobuf.Timestamp created_at = 5;
+  repeated ShippingRoute routes = 6;
+  repeated CargoReference cargos = 7;
+  uint32 evidence_count = 8;
+}
+
+message ShippingLabel {
+  int64 id = 1;
+  CompanyReference company = 2;
+  CompanyReference shipping_company = 3;
+  optional string remarks = 4;
+  google.protobuf.Timestamp created_at = 5;
+  repeated ShippingRoute routes = 6;
+  repeated ShippingListItem items = 7;
+}
+
+message ShippingRoute {
+  int32 order_no = 1;
+  AddressReference address = 2;
+  optional string callsign = 3;
+}
+
+message ShippingListItem {
+  int64 id = 1;
+  CargoReference cargo = 2;
+  optional string remarks = 3;
+  repeated Evidence images = 4;
+}
+
+message ShippingRouteInput {
+  int32 order_no = 1;
+  int64 address_id = 2;
+  optional string callsign = 3;
+}
+
+message ShippingListItemInput {
+  int64 cargo_id = 1;
+  optional string remarks = 2;
+  repeated EvidenceInput images = 3;
+}
+
+message CargoMovementSummary {
+  int64 id = 1;
+  CargoMovementType movement_type = 2;
+  int64 shipping_label_id = 3;
+  VesselReference vessel = 4;
+  optional string remarks = 5;
+  google.protobuf.Timestamp created_at = 6;
+  repeated CargoReference cargos = 7;
+  uint32 evidence_count = 8;
+}
+
+message CargoMovement {
+  int64 id = 1;
+  CargoMovementType movement_type = 2;
+  int64 shipping_label_id = 3;
+  VesselReference vessel = 4;
+  optional string remarks = 5;
+  google.protobuf.Timestamp created_at = 6;
+  repeated CargoMovementItem items = 7;
+}
+
+message CargoMovementItem {
+  int64 id = 1;
+  CargoReference cargo = 2;
+  optional string remarks = 3;
+  repeated Evidence images = 4;
+}
+
+message CargoMovementItemInput {
+  int64 cargo_id = 1;
+  optional string remarks = 2;
+  repeated EvidenceInput images = 3;
+}
+
+message CompanyReference {
+  int64 id = 1;
+  string name = 2;
+}
+
+message VesselReference {
+  int64 id = 1;
+  string name = 2;
+}
+
+// formatted_address is derived from the individual addresses table columns.
+message AddressReference {
+  int64 id = 1;
+  string formatted_address = 2;
+}
+
+message Evidence {
+  .harbour.common.v1.FileReference file = 1;
+  optional string remarks = 2;
+}
+
+message EvidenceInput {
+  int64 file_id = 1;
+  optional string remarks = 2;
+}
