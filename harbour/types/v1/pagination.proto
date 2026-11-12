@@ -3,10 +3,13 @@ syntax = "proto3";
 package harbour.types.v1;
 
 message PaginationRequest {
-  uint32 page_size = 1;
-  optional string page_token = 2;
+  uint32 page = 1;
+  uint32 page_size = 2;
 }
 
 message PaginationResponse {
-  optional string next_page_token = 1;
+  uint32 number_of_results = 1;
+  uint32 current_page = 2;
+  uint32 total_page = 3;
+  uint32 total_count = 4;
 }
