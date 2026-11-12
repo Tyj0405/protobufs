@@ -2,16 +2,21 @@ syntax = "proto3";
 
 package harbour.incident.v1;
 
+import "buf/validate/validate.proto";
+
 message UpdateIncident {
-  optional string description = 1;
-  optional int64 port_id = 2;
+  optional string description = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "(?s).*[^[:space:]].*"
+  }];
+  optional int64 port_id = 2 [(buf.validate.field).int64.gt = 0];
 
   // Omit this oneof to keep the current specific location. Select
   // clear_specific_location to remove the current berth, wharf, or terminal.
   oneof specific_location_update {
-    int64 berth_id = 3;
-    int64 wharf_id = 4;
-    int64 terminal_id = 5;
+    int64 berth_id = 3 [(buf.validate.field).int64.gt = 0];
+    int64 wharf_id = 4 [(buf.validate.field).int64.gt = 0];
+    int64 terminal_id = 5 [(buf.validate.field).int64.gt = 0];
     bool clear_specific_location = 6;
   }
 }
