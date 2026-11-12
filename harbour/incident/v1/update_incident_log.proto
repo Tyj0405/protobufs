@@ -2,12 +2,19 @@ syntax = "proto3";
 
 package harbour.incident.v1;
 
+import "buf/validate/validate.proto";
 import "harbour/types/v1/file.proto";
 import "harbour/types/v1/incident.proto";
 
 message UpdateIncidentLog {
-  optional harbour.types.v1.IncidentStatus status = 1;
-  optional string description = 2;
+  optional harbour.types.v1.IncidentStatus status = 1 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: 0
+  }];
+  optional string description = 2 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "(?s).*[^[:space:]].*"
+  }];
   optional string remarks = 3;
 
   // Omit to keep the current images. Provide an empty items list to clear them.

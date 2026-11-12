@@ -2,9 +2,11 @@ syntax = "proto3";
 
 package harbour.types.v1;
 
+import "buf/validate/validate.proto";
+
 message PaginationRequest {
-  uint32 page = 1;
-  uint32 page_size = 2;
+  uint32 page = 1 [(buf.validate.field).uint32.gt = 0];
+  uint32 page_size = 2 [(buf.validate.field).uint32.lte = 200];
 }
 
 message PaginationResponse {

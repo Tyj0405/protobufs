@@ -4,6 +4,9 @@ package harbour.task.v1;
 
 import "harbour/task/v1/append_task_log.proto";
 import "harbour/task/v1/create_task.proto";
+import "harbour/task/v1/update_task.proto";
+import "harbour/task/v1/append_task_log.proto";
+import "harbour/task/v1/update_task_log.proto";
 import "harbour/task/v1/get_task.proto";
 import "harbour/types/v1/pagination.proto";
 import "harbour/types/v1/task.proto";
@@ -24,13 +27,13 @@ service TaskService {
 
   // Creates a task and its initial Pending log for the authenticated creator.
   rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse) {}
-  // TODO: UpdateTask
-  // TODO: DeleteTask
+  rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse) {}
+  rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse) {}
 
   // Adds a status/progress log. The newest log becomes the latest task status.
   rpc AppendTaskLog(AppendTaskLogRequest) returns (AppendTaskLogResponse) {}
-  // TODO: UpdateTaskLog
-  // TODO: RemoveTaskLog
+  rpc UpdateTaskLog(UpdateTaskLogRequest) returns (UpdateTaskLogResponse) {}
+  rpc RemoveTaskLog(RemoveTaskLogRequest) returns (RemoveTaskLogResponse) {}
 }
 
 message ListTasksRequest {
@@ -62,6 +65,19 @@ message CreateTaskResponse {
   int64 created_id = 1;
 }
 
+message UpdateTaskRequest {
+  int64 task_id = 1;
+  UpdateTask info = 2;
+}
+
+message UpdateTaskResponse {}
+
+message DeleteTaskRequest {
+  int64 task_id = 1;
+}
+
+message DeleteTaskResponse {}
+
 message AppendTaskLogRequest {
   int64 task_id = 1;
   AppendTaskLog info = 2;
@@ -70,3 +86,16 @@ message AppendTaskLogRequest {
 message AppendTaskLogResponse {
   int64 created_id = 1;
 }
+
+message UpdateTaskLogRequest {
+  int64 task_log_id = 1;
+  UpdateTaskLog info = 2;
+}
+
+message UpdateTaskLogResponse {}
+
+message RemoveTaskLogRequest {
+  int64 task_log_id = 1;
+}
+
+message RemoveTaskLogResponse {}

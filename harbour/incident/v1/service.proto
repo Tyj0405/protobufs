@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package harbour.incident.v1;
 
+import "buf/validate/validate.proto";
 import "harbour/incident/v1/append_incident_log.proto";
 import "harbour/incident/v1/create_incident.proto";
 import "harbour/incident/v1/get_incident.proto";
@@ -33,10 +34,13 @@ service IncidentService {
 }
 
 message ListIncidentsRequest {
-  optional string query = 1;
-  repeated int64 port_id = 2;
-  repeated harbour.types.v1.IncidentStatus latest_status = 3;
-  repeated int64 created_by_user_id = 4;
+  optional string query = 1 [(buf.validate.field).string.max_len = 200];
+  repeated int64 port_id = 2 [(buf.validate.field).repeated.items.int64.gt = 0];
+  repeated harbour.types.v1.IncidentStatus latest_status = 3 [(buf.validate.field).repeated.items.enum = {
+    defined_only: true
+    not_in: 0
+  }];
+  repeated int64 created_by_user_id = 4 [(buf.validate.field).repeated.items.int64.gt = 0];
   harbour.types.v1.PaginationRequest pagination = 5;
 }
 
@@ -46,7 +50,7 @@ message ListIncidentsResponse {
 }
 
 message GetIncidentRequest {
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 message GetIncidentResponse {
@@ -54,7 +58,7 @@ message GetIncidentResponse {
 }
 
 message CreateIncidentRequest {
-  CreateIncident info = 1;
+  CreateIncident info = 1 [(buf.validate.field).required = true];
 }
 
 message CreateIncidentResponse {
@@ -62,21 +66,21 @@ message CreateIncidentResponse {
 }
 
 message UpdateIncidentRequest {
-  int64 id = 1;
-  UpdateIncident info = 2;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+  UpdateIncident info = 2 [(buf.validate.field).required = true];
 }
 
 message UpdateIncidentResponse {}
 
 message DeleteIncidentRequest {
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 message DeleteIncidentResponse {}
 
 message AppendIncidentLogRequest {
-  int64 id = 1;
-  AppendIncidentLog info = 2;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+  AppendIncidentLog info = 2 [(buf.validate.field).required = true];
 }
 
 message AppendIncidentLogResponse {
@@ -84,14 +88,14 @@ message AppendIncidentLogResponse {
 }
 
 message UpdateIncidentLogRequest {
-  int64 id = 1;
-  UpdateIncidentLog info = 2;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+  UpdateIncidentLog info = 2 [(buf.validate.field).required = true];
 }
 
 message UpdateIncidentLogResponse {}
 
 message RemoveIncidentLogRequest {
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 message RemoveIncidentLogResponse {}

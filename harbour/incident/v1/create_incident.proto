@@ -2,22 +2,26 @@ syntax = "proto3";
 
 package harbour.incident.v1;
 
+import "buf/validate/validate.proto";
 import "harbour/types/v1/file.proto";
 
 message CreateIncident {
-  string description = 1;
-  int64 port_id = 2;
+  string description = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "(?s).*[^[:space:]].*"
+  }];
+  int64 port_id = 2 [(buf.validate.field).int64.gt = 0];
 
   oneof specific_location_id {
-    int64 berth_id = 3;
-    int64 wharf_id = 4;
-    int64 terminal_id = 5;
+    int64 berth_id = 3 [(buf.validate.field).int64.gt = 0];
+    int64 wharf_id = 4 [(buf.validate.field).int64.gt = 0];
+    int64 terminal_id = 5 [(buf.validate.field).int64.gt = 0];
   }
 
   repeated harbour.types.v1.ImageEvidenceAttachment images = 6;
 }
 
 message IncidentImageInput {
-  int64 file_id = 1;
+  int64 file_id = 1 [(buf.validate.field).int64.gt = 0];
   optional string remarks = 2;
 }
