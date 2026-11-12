@@ -2,12 +2,12 @@ syntax = "proto3";
 
 package harbour.shipping.movement.v1;
 
-import "harbour/types/v1/pagination.proto";
-import "harbour/types/v1/shipping.proto";
+import "harbour/shipping/common/v1/update_shipping_item.proto";
 import "harbour/shipping/movement/v1/get_shipping_movement.proto";
 import "harbour/shipping/movement/v1/process_shipping_movement.proto";
 import "harbour/shipping/movement/v1/update_shipping_movement_info.proto";
-import "harbour/shipping/common/v1/update_shipping_item.proto";
+import "harbour/types/v1/pagination.proto";
+import "harbour/types/v1/shipping.proto";
 
 service ShippingMovementService {
   rpc ListShippingMovements(ListShippingMovementsRequest) returns (ListShippingMovementsResponse) {

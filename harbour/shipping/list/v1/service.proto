@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package harbour.shipping.list.v1;
 
-import "harbour/shipping/list/v1/create_shipping_list.proto";
-import "harbour/shipping/list/v1/update_shipping_list_info.proto";
 import "harbour/shipping/common/v1/update_shipping_item.proto";
+import "harbour/shipping/list/v1/create_shipping_list.proto";
 import "harbour/shipping/list/v1/get_shipping_list.proto";
+import "harbour/shipping/list/v1/update_shipping_list_info.proto";
 import "harbour/types/v1/pagination.proto";
 
 service ShippingListService {

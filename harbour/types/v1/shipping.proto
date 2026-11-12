@@ -3,12 +3,12 @@ syntax = "proto3";
 package harbour.types.v1;
 
 import "google/protobuf/timestamp.proto";
-import "harbour/types/v1/vessel.proto";
-import "harbour/types/v1/cargo.proto";
-import "harbour/types/v1/file.proto";
 import "harbour/types/v1/address.proto";
+import "harbour/types/v1/cargo.proto";
 import "harbour/types/v1/company.proto";
+import "harbour/types/v1/file.proto";
 import "harbour/types/v1/location.proto";
+import "harbour/types/v1/vessel.proto";
 
 message ShippingRoute {
   int32 order_no = 1;
