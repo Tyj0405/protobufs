@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package harbour.incident.v1;
+
+message UpdateIncident {
+  optional string description = 1;
+  optional int64 port_id = 2;
+
+  // Omit this oneof to keep the current specific location. Select
+  // clear_specific_location to remove the current berth, wharf, or terminal.
+  oneof specific_location_update {
+    int64 berth_id = 3;
+    int64 wharf_id = 4;
+    int64 terminal_id = 5;
+    bool clear_specific_location = 6;
+  }
+}
