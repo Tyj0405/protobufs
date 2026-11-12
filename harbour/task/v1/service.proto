@@ -5,7 +5,6 @@ package harbour.task.v1;
 import "harbour/task/v1/append_task_log.proto";
 import "harbour/task/v1/create_task.proto";
 import "harbour/task/v1/update_task.proto";
-import "harbour/task/v1/append_task_log.proto";
 import "harbour/task/v1/update_task_log.proto";
 import "harbour/task/v1/get_task.proto";
 import "harbour/types/v1/pagination.proto";
