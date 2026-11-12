@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package harbour.notification.v1;
 
-import "harbour/types/v1/pagination.proto";
-import "harbour/types/v1/notification.proto";
-import "harbour/notification/v1/get_notification.proto";
 import "harbour/notification/v1/dispatch_notification.proto";
+import "harbour/notification/v1/get_notification.proto";
+import "harbour/types/v1/notification.proto";
+import "harbour/types/v1/pagination.proto";
 
 // UserNotificationService contains operations available to an authenticated
 // notification recipient.

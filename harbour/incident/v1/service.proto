@@ -2,13 +2,13 @@ syntax = "proto3";
 
 package harbour.incident.v1;
 
-import "harbour/types/v1/pagination.proto";
-import "harbour/types/v1/incident.proto";
-import "harbour/incident/v1/get_incident.proto";
-import "harbour/incident/v1/create_incident.proto";
-import "harbour/incident/v1/update_incident.proto";
 import "harbour/incident/v1/append_incident_log.proto";
+import "harbour/incident/v1/create_incident.proto";
+import "harbour/incident/v1/get_incident.proto";
+import "harbour/incident/v1/update_incident.proto";
 import "harbour/incident/v1/update_incident_log.proto";
+import "harbour/types/v1/incident.proto";
+import "harbour/types/v1/pagination.proto";
 
 service IncidentService {
   // Returns incidents for the administrator list and staff mobile list.
