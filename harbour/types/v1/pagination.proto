@@ -5,13 +5,13 @@ package harbour.types.v1;
 import "buf/validate/validate.proto";
 
 message PaginationRequest {
-  // Zero uses the backend default. A non-zero value may not exceed 100.
-  uint32 page_size = 1 [(buf.validate.field).uint32.lte = 100];
-  // Number of matching records to skip before returning this page.
-  uint64 offset = 2 [(buf.validate.field).uint64.lte = 9223372036854775807];
+  uint32 page = 1 [(buf.validate.field).uint32.gt = 0];
+  uint32 page_size = 2 [(buf.validate.field).uint32.lte = 200];
 }
 
 message PaginationResponse {
-  // Total number of records matching the request filters.
-  uint64 total_count = 1;
+  uint32 number_of_results = 1;
+  uint32 current_page = 2;
+  uint32 total_page = 3;
+  uint32 total_count = 4;
 }

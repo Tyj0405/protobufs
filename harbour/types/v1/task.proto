@@ -27,7 +27,6 @@ message Task {
 
   UserReference created_by = 8;
   google.protobuf.Timestamp created_at = 9;
-
 }
 
 message TaskLog {

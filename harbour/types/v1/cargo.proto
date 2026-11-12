@@ -32,5 +32,3 @@ message CargoReference {
   int64 id = 1;
   string name = 2;
 }
-
-

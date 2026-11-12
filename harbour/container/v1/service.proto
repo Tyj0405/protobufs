@@ -2,11 +2,11 @@ syntax = "proto3";
 
 package harbour.container.v1;
 
-import "harbour/types/v1/pagination.proto";
-import "harbour/types/v1/container.proto";
-import "harbour/container/v1/get_container.proto";
 import "harbour/container/v1/create_container.proto";
+import "harbour/container/v1/get_container.proto";
 import "harbour/container/v1/update_container.proto";
+import "harbour/types/v1/container.proto";
+import "harbour/types/v1/pagination.proto";
 
 service ContainerService {
   rpc ListContainers(ListContainersRequest) returns (ListContainersResponse) {

@@ -2,11 +2,11 @@ syntax = "proto3";
 
 package harbour.cargo.v1;
 
-import "harbour/types/v1/pagination.proto";
-import "harbour/types/v1/cargo.proto";
-import "harbour/cargo/v1/get_cargo.proto";
 import "harbour/cargo/v1/create_cargo.proto";
+import "harbour/cargo/v1/get_cargo.proto";
 import "harbour/cargo/v1/update_cargo.proto";
+import "harbour/types/v1/cargo.proto";
+import "harbour/types/v1/pagination.proto";
 
 service CargoService {
   rpc ListCargos(ListCargosRequest) returns (ListCargosResponse) {
