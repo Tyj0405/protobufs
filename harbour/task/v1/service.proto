@@ -2,11 +2,13 @@ syntax = "proto3";
 
 package harbour.task.v1;
 
+import "buf/validate/validate.proto";
 import "harbour/task/v1/append_task_log.proto";
+import "harbour/task/v1/calendar.proto";
 import "harbour/task/v1/create_task.proto";
+import "harbour/task/v1/get_task.proto";
 import "harbour/task/v1/update_task.proto";
 import "harbour/task/v1/update_task_log.proto";
-import "harbour/task/v1/get_task.proto";
 import "harbour/types/v1/pagination.proto";
 import "harbour/types/v1/task.proto";
 
@@ -24,9 +26,21 @@ service TaskService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
+  // Returns tasks that overlap a requested calendar period.
+  rpc ListTaskCalendar(ListTaskCalendarRequest) returns (ListTaskCalendarResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Produces an iCalendar file for tasks in a requested calendar period.
+  rpc ExportTaskCalendar(ExportTaskCalendarRequest) returns (ExportTaskCalendarResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
   // Creates a task and its initial Pending log for the authenticated creator.
   rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse) {}
   rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse) {}
+  // Assigns one or more existing tasks to the same staff member atomically.
+  rpc AssignTasks(AssignTasksRequest) returns (AssignTasksResponse) {}
   rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse) {}
 
   // Adds a status/progress log. The newest log becomes the latest task status.
@@ -36,10 +50,13 @@ service TaskService {
 }
 
 message ListTasksRequest {
-  optional string query = 3;
-  repeated int64 port_id = 1;
-  repeated harbour.types.v1.TaskStatus latest_status = 2;
-  repeated int64 assigned_user_id = 4;
+  optional string query = 3 [(buf.validate.field).string.max_len = 200];
+  repeated int64 port_id = 1 [(buf.validate.field).repeated.items.int64.gt = 0];
+  repeated harbour.types.v1.TaskStatus latest_status = 2 [(buf.validate.field).repeated.items.enum = {
+    defined_only: true
+    not_in: 0
+  }];
+  repeated int64 assigned_user_id = 4 [(buf.validate.field).repeated.items.int64.gt = 0];
   harbour.types.v1.PaginationRequest pagination = 5;
 }
 
@@ -49,7 +66,7 @@ message ListTasksResponse {
 }
 
 message GetTaskRequest {
-  int64 task_id = 1;
+  int64 task_id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 message GetTaskResponse {
@@ -57,7 +74,7 @@ message GetTaskResponse {
 }
 
 message CreateTaskRequest {
-  CreateTask info = 1;
+  CreateTask info = 1 [(buf.validate.field).required = true];
 }
 
 message CreateTaskResponse {
@@ -65,21 +82,36 @@ message CreateTaskResponse {
 }
 
 message UpdateTaskRequest {
-  int64 task_id = 1;
-  UpdateTask info = 2;
+  int64 task_id = 1 [(buf.validate.field).int64.gt = 0];
+  UpdateTask info = 2 [(buf.validate.field).required = true];
 }
 
-message UpdateTaskResponse {}
+message UpdateTaskResponse {
+  int64 updated_id = 1;
+}
+
+message AssignTasksRequest {
+  repeated int64 task_id = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.int64.gt = 0
+  ];
+  int64 assigned_user_id = 2 [(buf.validate.field).int64.gt = 0];
+}
+
+message AssignTasksResponse {
+  repeated int64 updated_task_id = 1;
+}
 
 message DeleteTaskRequest {
-  int64 task_id = 1;
+  int64 task_id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 message DeleteTaskResponse {}
 
 message AppendTaskLogRequest {
-  int64 task_id = 1;
-  AppendTaskLog info = 2;
+  int64 task_id = 1 [(buf.validate.field).int64.gt = 0];
+  AppendTaskLog info = 2 [(buf.validate.field).required = true];
 }
 
 message AppendTaskLogResponse {
@@ -87,14 +119,14 @@ message AppendTaskLogResponse {
 }
 
 message UpdateTaskLogRequest {
-  int64 task_log_id = 1;
-  UpdateTaskLog info = 2;
+  int64 task_log_id = 1 [(buf.validate.field).int64.gt = 0];
+  UpdateTaskLog info = 2 [(buf.validate.field).required = true];
 }
 
 message UpdateTaskLogResponse {}
 
 message RemoveTaskLogRequest {
-  int64 task_log_id = 1;
+  int64 task_log_id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 message RemoveTaskLogResponse {}
