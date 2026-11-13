@@ -6,6 +6,12 @@ import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
 message CreateTask {
+  option (buf.validate.message).cel = {
+    id: "task.create.end_after_start"
+    message: "end_at must be after start_at"
+    expression: "!has(this.start_at) || !has(this.end_at) || this.end_at > this.start_at"
+  };
+
   int64 assigned_user_id = 1 [(buf.validate.field).int64.gt = 0];
   int64 port_id = 2 [(buf.validate.field).int64.gt = 0];
   string name = 3 [(buf.validate.field).string = {

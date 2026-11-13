@@ -3,8 +3,8 @@ syntax = "proto3";
 package harbour.task.v1;
 
 import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 import "harbour/task/v1/append_task_log.proto";
-import "harbour/task/v1/calendar.proto";
 import "harbour/task/v1/create_task.proto";
 import "harbour/task/v1/get_task.proto";
 import "harbour/task/v1/update_task.proto";
@@ -31,8 +31,8 @@ service TaskService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  // Produces an iCalendar file for tasks in a requested calendar period.
-  rpc ExportTaskCalendar(ExportTaskCalendarRequest) returns (ExportTaskCalendarResponse) {
+  // Produces an iCalendar text document for tasks in a requested period.
+  rpc ExportTaskCalendarICal(ExportTaskCalendarICalRequest) returns (ExportTaskCalendarICalResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
@@ -65,6 +65,62 @@ message ListTasksResponse {
   harbour.types.v1.PaginationResponse pagination = 2;
 }
 
+message ListTaskCalendarRequest {
+  option (buf.validate.message).cel = {
+    id: "task.calendar.valid_range"
+    message: "calendar range_start must be before range_end"
+    expression: "this.range_start < this.range_end"
+  };
+
+  google.protobuf.Timestamp range_start = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).timestamp = {}
+  ];
+  google.protobuf.Timestamp range_end = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).timestamp = {}
+  ];
+  repeated int64 port_id = 3 [(buf.validate.field).repeated.items.int64.gt = 0];
+  repeated harbour.types.v1.TaskStatus latest_status = 4 [(buf.validate.field).repeated.items.enum = {
+    defined_only: true
+    not_in: 0
+  }];
+  repeated int64 assigned_user_id = 5 [(buf.validate.field).repeated.items.int64.gt = 0];
+  optional string query = 6 [(buf.validate.field).string.max_len = 200];
+}
+
+message ListTaskCalendarResponse {
+  repeated TaskSummary results = 1;
+}
+
+message ExportTaskCalendarICalRequest {
+  option (buf.validate.message).cel = {
+    id: "task.calendar.export_valid_range"
+    message: "calendar range_start must be before range_end"
+    expression: "this.range_start < this.range_end"
+  };
+
+  google.protobuf.Timestamp range_start = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).timestamp = {}
+  ];
+  google.protobuf.Timestamp range_end = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).timestamp = {}
+  ];
+  repeated int64 port_id = 3 [(buf.validate.field).repeated.items.int64.gt = 0];
+  repeated harbour.types.v1.TaskStatus latest_status = 4 [(buf.validate.field).repeated.items.enum = {
+    defined_only: true
+    not_in: 0
+  }];
+  repeated int64 assigned_user_id = 5 [(buf.validate.field).repeated.items.int64.gt = 0];
+  optional string query = 6 [(buf.validate.field).string.max_len = 200];
+}
+
+message ExportTaskCalendarICalResponse {
+  string ical = 1;
+}
+
 message GetTaskRequest {
   int64 task_id = 1 [(buf.validate.field).int64.gt = 0];
 }
@@ -86,9 +142,7 @@ message UpdateTaskRequest {
   UpdateTask info = 2 [(buf.validate.field).required = true];
 }
 
-message UpdateTaskResponse {
-  int64 updated_id = 1;
-}
+message UpdateTaskResponse {}
 
 message AssignTasksRequest {
   repeated int64 task_id = 1 [
@@ -99,9 +153,7 @@ message AssignTasksRequest {
   int64 assigned_user_id = 2 [(buf.validate.field).int64.gt = 0];
 }
 
-message AssignTasksResponse {
-  repeated int64 updated_task_id = 1;
-}
+message AssignTasksResponse {}
 
 message DeleteTaskRequest {
   int64 task_id = 1 [(buf.validate.field).int64.gt = 0];

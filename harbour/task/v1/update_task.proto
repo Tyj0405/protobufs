@@ -6,12 +6,6 @@ import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
 message UpdateTask {
-  option (buf.validate.message).cel = {
-    id: "task.update.has_changes"
-    message: "at least one task field must be provided"
-    expression: "has(this.assigned_user_id) || has(this.port_id) || has(this.name) || has(this.description) || has(this.start_at) || has(this.clear_start_at) || has(this.end_at)"
-  };
-
   optional int64 assigned_user_id = 1 [(buf.validate.field).int64.gt = 0];
   optional int64 port_id = 2 [(buf.validate.field).int64.gt = 0];
   optional string name = 3 [(buf.validate.field).string = {
