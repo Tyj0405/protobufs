@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package harbour.tenant.v1;
 
-import "harbour/user/v1/register_user.proto";
 import "harbour/tenant/v1/register_tenant.proto";
+import "harbour/user/v1/register_user.proto";
 
 service TenantService {
   rpc RegisterTenant(RegisterTenantRequest) returns (RegisterTenantResponse) {}
