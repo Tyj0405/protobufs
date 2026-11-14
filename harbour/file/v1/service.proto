@@ -28,6 +28,7 @@ message UploadFileResponse {
 
 message ViewFileRequest {
   int64 file_id = 1 [(buf.validate.field).int64.gt = 0];
+  uint64 chunk_size_kb = 2 [(buf.validate.field).uint64.gt = 0];
 }
 
 message ViewFileResponse {
