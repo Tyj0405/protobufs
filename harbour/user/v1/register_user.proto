@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package harbour.account.v1;
+package harbour.user.v1;
 
 message RegisterUser {
   string username = 1;

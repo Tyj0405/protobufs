@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package harbour.tenant.v1;
 
-import "harbour/account/v1/register_account.proto";
+import "harbour/user/v1/register_user.proto";
 import "harbour/tenant/v1/register_tenant.proto";
 
 service TenantService {
@@ -12,7 +12,7 @@ service TenantService {
 
 message RegisterTenantRequest {
   harbour.tenant.v1.RegisterTenantInformation tenant = 1;
-  harbour.account.v1.RegisterUser root_user = 2;
+  harbour.user.v1.RegisterUser root_user = 2;
 }
 
 message RegisterTenantResponse {}
