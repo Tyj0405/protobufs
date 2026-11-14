@@ -2,11 +2,18 @@ syntax = "proto3";
 
 package harbour.task.v1;
 
+import "buf/validate/validate.proto";
 import "harbour/types/v1/task.proto";
 
 message UpdateTaskLog {
-  optional harbour.types.v1.TaskStatus status = 1;
-  optional string description = 2;
+  optional harbour.types.v1.TaskStatus status = 1 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: 0
+  }];
+  optional string description = 2 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "(?s).*[^[:space:]].*"
+  }];
 
   // Send an empty value to clear the nullable remarks column.
   optional string remarks = 3;

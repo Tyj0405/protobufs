@@ -2,20 +2,27 @@ syntax = "proto3";
 
 package harbour.task.v1;
 
+import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
 message UpdateTask {
-  optional int64 assigned_user_id = 1;
-  optional int64 port_id = 2;
-  optional string name = 3;
-  optional string description = 4;
+  optional int64 assigned_user_id = 1 [(buf.validate.field).int64.gt = 0];
+  optional int64 port_id = 2 [(buf.validate.field).int64.gt = 0];
+  optional string name = 3 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "(?s).*[^[:space:]].*"
+  }];
+  optional string description = 4 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "(?s).*[^[:space:]].*"
+  }];
 
   // Omit to keep the current start time. Select clear_start_at to store NULL.
   oneof start_at_update {
-    google.protobuf.Timestamp start_at = 5;
+    google.protobuf.Timestamp start_at = 5 [(buf.validate.field).timestamp = {}];
     bool clear_start_at = 7;
   }
 
   // Omit to keep the current required end time.
-  google.protobuf.Timestamp end_at = 6;
+  google.protobuf.Timestamp end_at = 6 [(buf.validate.field).timestamp = {}];
 }
