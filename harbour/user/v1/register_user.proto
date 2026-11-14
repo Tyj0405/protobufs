@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package harbour.user.v1;
+
+import "buf/validate/validate.proto";
+
+message RegisterUser {
+  string username = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.pattern = "^[a-z0-9-_]+$" // all lower with nums, dash, and hyphen
+  ];
+  string email = 2 [(buf.validate.field).string.email = true];
+  string password = 3 [(buf.validate.field).string = {
+    min_len: 15
+    max_len: 200
+  }];
+}
