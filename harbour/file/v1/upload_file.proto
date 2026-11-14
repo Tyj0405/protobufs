@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package harbour.file.v1;
+
+message UploadFileInfo {
+  string filename = 1;
+  string mimetype = 2;
+  uint32 poll_seconds = 3;
+}
