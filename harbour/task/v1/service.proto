@@ -57,7 +57,7 @@ message ListTasksRequest {
     not_in: 0
   }];
   repeated int64 assigned_user_id = 4 [(buf.validate.field).repeated.items.int64.gt = 0];
-  harbour.types.v1.PaginationRequest pagination = 5;
+  harbour.types.v1.PaginationRequest pagination = 5 [(buf.validate.field).required = true];
 }
 
 message ListTasksResponse {
