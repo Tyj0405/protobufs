@@ -2,7 +2,9 @@ syntax = "proto3";
 
 package harbour.notification.v1;
 
+import "buf/validate/validate.proto";
+
 message NotificationRecipient {
-  int64 user_id = 1;
+  int64 user_id = 1 [(buf.validate.field).int64.gt = 0];
   bool is_important = 2;
 }

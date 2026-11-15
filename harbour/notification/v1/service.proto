@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package harbour.notification.v1;
 
+import "buf/validate/validate.proto";
 import "harbour/notification/v1/dispatch_notification.proto";
 import "harbour/notification/v1/get_notification.proto";
 import "harbour/types/v1/notification.proto";
@@ -44,7 +45,7 @@ message ListMyNotificationsRequest {
   // When present, returns only read or only unread notifications.
   optional bool read = 1;
   optional bool is_important = 2;
-  harbour.types.v1.PaginationRequest pagination = 3;
+  harbour.types.v1.PaginationRequest pagination = 3 [(buf.validate.field).required = true];
 }
 
 message ListMyNotificationsResponse {
@@ -53,15 +54,15 @@ message ListMyNotificationsResponse {
 }
 
 message MarkNotificationReadRequest {
-  int64 notification_id = 1;
+  int64 notification_id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 message MarkNotificationReadResponse {}
 
 message ListNotificationsRequest {
-  optional string query = 1;
-  repeated int64 created_by_user_id = 2;
-  harbour.types.v1.PaginationRequest pagination = 3;
+  optional string query = 1 [(buf.validate.field).string.max_len = 200];
+  repeated int64 created_by_user_id = 2 [(buf.validate.field).repeated.items.int64.gt = 0];
+  harbour.types.v1.PaginationRequest pagination = 3 [(buf.validate.field).required = true];
 }
 
 message ListNotificationsResponse {
@@ -70,7 +71,7 @@ message ListNotificationsResponse {
 }
 
 message GetNotificationRequest {
-  int64 notification_id = 1;
+  int64 notification_id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 message GetNotificationResponse {
@@ -78,12 +79,20 @@ message GetNotificationResponse {
 }
 
 message CreateNotificationRequest {
-  string title = 1;
-  string content = 2;
+  string title = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 200
+    pattern: "(?s).*[^[:space:]].*"
+  }];
+  string content = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 10000
+    pattern: "(?s).*[^[:space:]].*"
+  }];
 
   // The first group of users who should receive the notification. The backend
   // creates both the notification and these dispatch records transactionally.
-  repeated NotificationRecipient recipients = 3;
+  repeated NotificationRecipient recipients = 3 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message CreateNotificationResponse {
@@ -91,11 +100,11 @@ message CreateNotificationResponse {
 }
 
 message DispatchNotificationRequest {
-  int64 notification_id = 1;
+  int64 notification_id = 1 [(buf.validate.field).int64.gt = 0];
 
   // Additional recipients. A user who already received this notification must
   // not be inserted again because the database uses a composite primary key.
-  repeated NotificationRecipient recipients = 2;
+  repeated NotificationRecipient recipients = 2 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message DispatchNotificationResponse {}
