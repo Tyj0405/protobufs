@@ -5,6 +5,22 @@ package harbour.notification.v1;
 import "buf/validate/validate.proto";
 
 message NotificationRecipient {
-  int64 user_id = 1 [(buf.validate.field).int64.gt = 0];
+  oneof target {
+    option (buf.validate.oneof).required = true;
+
+    // Sends to one user.
+    int64 user_id = 1 [(buf.validate.field).int64.gt = 0];
+    // Sends to every user assigned to this role.
+    int64 role_id = 3 [(buf.validate.field).int64.gt = 0];
+    // Sends to every user in the current tenant.
+    bool all_users = 4 [(buf.validate.field).bool.const = true];
+  }
+
   bool is_important = 2;
+}
+
+message NotificationRecipientRole {
+  int64 id = 1;
+  string name = 2;
+  uint32 user_count = 3;
 }
