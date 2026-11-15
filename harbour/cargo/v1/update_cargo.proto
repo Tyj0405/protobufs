@@ -2,12 +2,20 @@ syntax = "proto3";
 
 package harbour.cargo.v1;
 
+import "buf/validate/validate.proto";
+
 message UpdateCargo {
-  optional string name = 1;
-  optional string description = 2;
-  optional double quantity = 3;
-  optional int64 unit_of_measure_id = 4;
-  optional double unit_height_m = 5;
-  optional double unit_width_m = 6;
-  optional double unit_length_m = 7;
+  optional string name = 1 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "(?s).*[^[:space:]].*"
+  }];
+  optional string description = 2 [(buf.validate.field).string = {
+    min_len: 1
+    pattern: "(?s).*[^[:space:]].*"
+  }];
+  optional double quantity = 3 [(buf.validate.field).double.gt = 0];
+  optional int64 unit_of_measure_id = 4 [(buf.validate.field).int64.gt = 0];
+  optional double unit_height_m = 5 [(buf.validate.field).double.gt = 0];
+  optional double unit_width_m = 6 [(buf.validate.field).double.gt = 0];
+  optional double unit_length_m = 7 [(buf.validate.field).double.gt = 0];
 }
