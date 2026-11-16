@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package harbour.auth.v1;
 
+import "buf/validate/validate.proto";
 import "harbour/types/v1/two_factor.proto";
 
 service AuthService {
@@ -21,9 +22,17 @@ service AuthService {
 }
 
 message LoginRequest {
-  string tenant_id = 1;
-  string username = 2; // Can be email as well
-  string password = 3;
+  string tenant_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 200
+    pattern: "(?s).*[^[:space:]].*"
+  }];
+  string username = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 254
+    pattern: "(?s).*[^[:space:]].*"
+  }]; // Can be email as well
+  string password = 3 [(buf.validate.field).string.min_len = 1];
 }
 
 message LoginResponse {
