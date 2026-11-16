@@ -2,7 +2,15 @@ syntax = "proto3";
 
 package harbour.tenant.v1;
 
+import "buf/validate/validate.proto";
+
 message RegisterTenantInformation {
-  string identifier = 1;
-  string name = 2;
+  string identifier = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.pattern = "^[a-z0-9-_]+$" // all lower with nums, dash, and hyphen
+  ];
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 50
+  }];
 }
