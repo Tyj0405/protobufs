@@ -12,11 +12,15 @@ message NotificationRecipient {
     int64 user_id = 1 [(buf.validate.field).int64.gt = 0];
     // Sends to every user assigned to this role.
     int64 role_id = 3 [(buf.validate.field).int64.gt = 0];
-    // Sends to every user in the current tenant.
-    bool all_users = 4 [(buf.validate.field).bool.const = true];
   }
 
   bool is_important = 2;
+}
+
+// Sends to every user in the current tenant. This is separate from the
+// repeated recipient list because a request can contain at most one broadcast.
+message AllUsersNotificationRecipient {
+  bool is_important = 1;
 }
 
 message NotificationRecipientRole {
