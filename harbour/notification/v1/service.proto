@@ -23,6 +23,11 @@ service UserNotificationService {
 // AdminNotificationService contains notification management operations that
 // require administrator access.
 service AdminNotificationService {
+  // Returns roles available for responsibility-based group dispatch.
+  rpc ListNotificationRecipientRoles(ListNotificationRecipientRolesRequest) returns (ListNotificationRecipientRolesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
   // Returns notifications created for management purposes.
   rpc ListNotifications(ListNotificationsRequest) returns (ListNotificationsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
@@ -39,6 +44,12 @@ service AdminNotificationService {
 
   // Dispatches an existing notification to additional users.
   rpc DispatchNotification(DispatchNotificationRequest) returns (DispatchNotificationResponse) {}
+}
+
+message ListNotificationRecipientRolesRequest {}
+
+message ListNotificationRecipientRolesResponse {
+  repeated NotificationRecipientRole roles = 1;
 }
 
 message ListMyNotificationsRequest {
