@@ -90,6 +90,12 @@ message GetNotificationResponse {
 }
 
 message CreateNotificationRequest {
+  option (buf.validate.message).cel = {
+    id: "notification.create.recipients"
+    message: "at least one recipient or all_users must be provided"
+    expression: "this.recipients.size() > 0 || has(this.all_users)"
+  };
+
   string title = 1 [(buf.validate.field).string = {
     min_len: 1
     max_len: 200
@@ -103,7 +109,8 @@ message CreateNotificationRequest {
 
   // The first group of users who should receive the notification. The backend
   // creates both the notification and these dispatch records transactionally.
-  repeated NotificationRecipient recipients = 3 [(buf.validate.field).repeated.min_items = 1];
+  repeated NotificationRecipient recipients = 3;
+  optional AllUsersNotificationRecipient all_users = 4;
 }
 
 message CreateNotificationResponse {
@@ -111,11 +118,18 @@ message CreateNotificationResponse {
 }
 
 message DispatchNotificationRequest {
+  option (buf.validate.message).cel = {
+    id: "notification.dispatch.recipients"
+    message: "at least one recipient or all_users must be provided"
+    expression: "this.recipients.size() > 0 || has(this.all_users)"
+  };
+
   int64 notification_id = 1 [(buf.validate.field).int64.gt = 0];
 
   // Additional recipients. A user who already received this notification must
   // not be inserted again because the database uses a composite primary key.
-  repeated NotificationRecipient recipients = 2 [(buf.validate.field).repeated.min_items = 1];
+  repeated NotificationRecipient recipients = 2;
+  optional AllUsersNotificationRecipient all_users = 3;
 }
 
 message DispatchNotificationResponse {}
