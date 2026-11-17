@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package harbour.vessel.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "harbour/types/v1/pagination.proto";
+import "harbour/types/v1/vessel.proto";
+
+service VesselService {
+  rpc ListVessels(ListVesselsRequest) returns (ListVesselsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc GetVessel(GetVesselRequest) returns (GetVesselResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc CreateVessel(CreateVesselRequest) returns (CreateVesselResponse) {}
+  rpc UpdateVessel(UpdateVesselRequest) returns (UpdateVesselResponse) {}
+  rpc DeleteVessel(DeleteVesselRequest) returns (DeleteVesselResponse) {}
+}
+
+message ListVesselsRequest {
+  harbour.types.v1.PaginationRequest pagination = 1;
+}
+
+message ListVesselsResponse {
+  repeated harbour.types.v1.Vessel results = 1;
+  harbour.types.v1.PaginationResponse pagination = 2;
+}
+
+message GetVesselRequest {
+  int64 id = 1;
+}
+
+message GetVesselResponse {
+  harbour.types.v1.Vessel info = 1;
+}
+
+message CreateVesselRequest {
+  harbour.types.v1.VesselCreate info = 1;
+}
+
+message CreateVesselResponse {
+  int64 created_id = 1;
+}
+
+message UpdateVesselRequest {
+  harbour.types.v1.Vessel info = 1;
+  google.protobuf.FieldMask update_mask = 2 [(buf.validate.field).cel = {
+    id: "valid_field_mask"
+    message: "a field mask path must be one of name, type, imo, mmsi, callsign, dwt, navigation.geometry, navigation.status, navigation.anchorage.id, navigation.channel.id, navigation.berth.id, owner_company.id"
+    expression: "this.paths.all(path, path in ['name', 'type', 'imo', 'mmsi', 'callsign', 'dwt', 'navigation.geometry', 'navigation.status', 'navigation.anchorage.id', 'navigation.channel.id', 'navigation.berth.id', 'owner_company.id'])"
+  }];
+}
+
+message UpdateVesselResponse {}
+
+message DeleteVesselRequest {
+  int64 id = 1;
+}
+
+message DeleteVesselResponse {}
