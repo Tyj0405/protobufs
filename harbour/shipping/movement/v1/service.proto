@@ -9,8 +9,12 @@ import "harbour/shipping/movement/v1/process_shipping_movement.proto";
 import "harbour/shipping/movement/v1/update_shipping_movement_info.proto";
 import "harbour/types/v1/pagination.proto";
 import "harbour/types/v1/shipping.proto";
+import "harbour/types/v1/vessel.proto";
 
 service ShippingMovementService {
+  rpc ListShippingMovementVessels(ListShippingMovementVesselsRequest) returns (ListShippingMovementVesselsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
   rpc ListShippingMovements(ListShippingMovementsRequest) returns (ListShippingMovementsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
@@ -20,6 +24,12 @@ service ShippingMovementService {
   rpc UpdateShippingMovementItem(UpdateShippingMovementItemRequest) returns (UpdateShippingMovementItemResponse) {}
   rpc RemoveShippingMovementItem(RemoveShippingMovementItemRequest) returns (RemoveShippingMovementItemResponse) {}
   rpc RemoveShippingMovementItemImage(RemoveShippingMovementItemImageRequest) returns (RemoveShippingMovementItemImageResponse) {}
+}
+
+message ListShippingMovementVesselsRequest {}
+
+message ListShippingMovementVesselsResponse {
+  repeated harbour.types.v1.VesselReference vessels = 1;
 }
 
 message ListShippingMovementsRequest {
@@ -38,6 +48,12 @@ message ListShippingMovementsResponse {
 }
 
 message ProgressShippingMovementRequest {
+  option (buf.validate.message).cel = {
+    id: "shipping_movement.unique_cargos"
+    message: "each cargo may only appear once"
+    expression: "this.items.map(item, item.cargo_id).unique()"
+  };
+
   int64 shipping_list_id = 1 [(buf.validate.field).int64.gt = 0];
   harbour.types.v1.ShippingMovementType movement_type = 2 [(buf.validate.field).enum = {
     defined_only: true
