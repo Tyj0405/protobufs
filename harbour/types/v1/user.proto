@@ -26,6 +26,20 @@ message UserLoginHistory {
   string ip_address = 2;
 }
 
+message UserSMS2FA {
+  google.protobuf.Timestamp enabled_at = 1;
+}
+
+message UserEmail2FA {
+  google.protobuf.Timestamp enabled_at = 1;
+}
+
+message UserTotp2FA {
+  string name = 1;
+  string secret = 2;
+  google.protobuf.Timestamp enabled_at = 3;
+}
+
 message UserReference {
   int64 id = 1;
   string username = 2;
