@@ -7,6 +7,7 @@ import "harbour/types/v1/two_factor.proto";
 
 service AuthService {
   rpc Login(LoginRequest) returns (LoginResponse) {}
+  rpc AuthenticatedLogin(AuthenticatedLoginRequest) returns (AuthenticatedLoginResponse) {}
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {}
   rpc Logout(LogoutRequest) returns (LogoutResponse) {}
 
@@ -39,6 +40,15 @@ message LoginResponse {
   bool two_factor = 1;
   string access_token = 2;
   string refresh_token = 3;
+}
+
+message AuthenticatedLoginRequest {
+  string password = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message AuthenticatedLoginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
 }
 
 message RefreshTokenRequest {
