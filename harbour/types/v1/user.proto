@@ -12,11 +12,11 @@ message User {
     (buf.validate.field).string.pattern = "^[a-z0-9-_]+$" // all lower with nums, dash, and hyphen
   ];
   string email = 3 [(buf.validate.field).string.email = true];
-  string display_name = 4 [(buf.validate.field).string = {
+  optional string display_name = 4 [(buf.validate.field).string = {
     min_len: 1
     max_len: 50
   }];
-  string phone_number = 5 [(buf.validate.field).string.pattern = '^\\+[1-9]\\d{1,14}$']; // https://stackoverflow.com/questions/6478875/regular-expression-matching-e-164-formatted-phone-numbers
+  optional string phone_number = 5 [(buf.validate.field).string.pattern = '^\\+[1-9]\\d{1,14}$']; // https://stackoverflow.com/questions/6478875/regular-expression-matching-e-164-formatted-phone-numbers
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp last_logged_in = 7;
 }
