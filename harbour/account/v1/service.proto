@@ -74,8 +74,9 @@ message DisableEmailTwoFactorRequest {}
 message DisableEmailTwoFactorResponse {}
 
 message EnableTotpTwoFactorRequest {
-  string secret = 1;
-  string code = 2;
+  string name = 1;
+  string secret = 2;
+  string code = 3;
 }
 
 message EnableTotpTwoFactorResponse {}
