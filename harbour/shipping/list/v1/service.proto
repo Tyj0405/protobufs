@@ -2,13 +2,20 @@ syntax = "proto3";
 
 package harbour.shipping.list.v1;
 
+import "buf/validate/validate.proto";
 import "harbour/shipping/common/v1/update_shipping_item.proto";
 import "harbour/shipping/list/v1/create_shipping_list.proto";
 import "harbour/shipping/list/v1/get_shipping_list.proto";
 import "harbour/shipping/list/v1/update_shipping_list_info.proto";
+import "harbour/types/v1/address.proto";
+import "harbour/types/v1/company.proto";
 import "harbour/types/v1/pagination.proto";
 
 service ShippingListService {
+  // Returns companies and route addresses without requiring an existing label.
+  rpc GetShippingListFormOptions(GetShippingListFormOptionsRequest) returns (GetShippingListFormOptionsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
   rpc ListShippingLists(ListShippingListsRequest) returns (ListShippingListsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
@@ -23,13 +30,20 @@ service ShippingListService {
   rpc RemoveShippingListItemImage(RemoveShippingListItemImageRequest) returns (RemoveShippingListItemImageResponse) {}
 }
 
+message GetShippingListFormOptionsRequest {}
+
+message GetShippingListFormOptionsResponse {
+  repeated harbour.types.v1.CompanyReference companies = 1;
+  repeated harbour.types.v1.AddressReference addresses = 2;
+}
+
 message ListShippingListsRequest {
-  repeated int64 id = 1;
-  repeated int64 port_id = 2;
-  repeated int64 company_id = 3;
-  repeated int64 shipping_company_id = 4;
-  repeated int64 cargo_id = 5;
-  harbour.types.v1.PaginationRequest pagination = 7;
+  repeated int64 id = 1 [(buf.validate.field).repeated.items.int64.gt = 0];
+  repeated int64 port_id = 2 [(buf.validate.field).repeated.items.int64.gt = 0];
+  repeated int64 company_id = 3 [(buf.validate.field).repeated.items.int64.gt = 0];
+  repeated int64 shipping_company_id = 4 [(buf.validate.field).repeated.items.int64.gt = 0];
+  repeated int64 cargo_id = 5 [(buf.validate.field).repeated.items.int64.gt = 0];
+  harbour.types.v1.PaginationRequest pagination = 7 [(buf.validate.field).required = true];
 }
 
 message ListShippingListsResponse {
@@ -38,7 +52,7 @@ message ListShippingListsResponse {
 }
 
 message GetShippingListRequest {
-  int64 shipping_list_id = 1;
+  int64 shipping_list_id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 message GetShippingListResponse {
@@ -46,7 +60,7 @@ message GetShippingListResponse {
 }
 
 message CreateShippingListRequest {
-  CreateShippingListInfo info = 1;
+  CreateShippingListInfo info = 1 [(buf.validate.field).required = true];
 }
 
 message CreateShippingListResponse {
@@ -54,34 +68,34 @@ message CreateShippingListResponse {
 }
 
 message UpdateShippingListInfoRequest {
-  int64 id = 1;
-  UpdateShippingListInfo info = 2;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+  UpdateShippingListInfo info = 2 [(buf.validate.field).required = true];
 }
 
 message UpdateShippingListInfoResponse {}
 
 message DeleteShippingListRequest {
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 message DeleteShippingListResponse {}
 
 message UpdateShippingListItemRequest {
-  int64 id = 1;
-  harbour.shipping.common.v1.UpdateShippingItem item = 2;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+  harbour.shipping.common.v1.UpdateShippingItem item = 2 [(buf.validate.field).required = true];
 }
 
 message UpdateShippingListItemResponse {}
 
 message RemoveShippingListItemRequest {
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
 }
 
 message RemoveShippingListItemResponse {}
 
 message RemoveShippingListItemImageRequest {
-  int64 item_id = 1;
-  int64 file_id = 2;
+  int64 item_id = 1 [(buf.validate.field).int64.gt = 0];
+  int64 file_id = 2 [(buf.validate.field).int64.gt = 0];
 }
 
 message RemoveShippingListItemImageResponse {}

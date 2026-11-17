@@ -2,10 +2,18 @@ syntax = "proto3";
 
 package harbour.container.v1;
 
+import "buf/validate/validate.proto";
+
 message UpdateContainer {
-  optional string cin = 2;
-  optional int64 size_id = 3;
+  optional string cin = 2 [(buf.validate.field).string = {
+    len: 11
+    pattern: "^[A-Z]{4}[0-9]{7}$"
+  }];
+  optional int64 size_id = 3 [(buf.validate.field).int64.gt = 0];
 
   // Replaces the current container_cargos relationships.
-  repeated int64 cargo_ids = 4;
+  repeated int64 cargo_ids = 4 [
+    (buf.validate.field).repeated.unique = true,
+    (buf.validate.field).repeated.items.int64.gt = 0
+  ];
 }
