@@ -7,9 +7,15 @@ import "harbour/shipping/common/v1/update_shipping_item.proto";
 import "harbour/shipping/list/v1/create_shipping_list.proto";
 import "harbour/shipping/list/v1/get_shipping_list.proto";
 import "harbour/shipping/list/v1/update_shipping_list_info.proto";
+import "harbour/types/v1/address.proto";
+import "harbour/types/v1/company.proto";
 import "harbour/types/v1/pagination.proto";
 
 service ShippingListService {
+  // Returns companies and route addresses without requiring an existing label.
+  rpc GetShippingListFormOptions(GetShippingListFormOptionsRequest) returns (GetShippingListFormOptionsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
   rpc ListShippingLists(ListShippingListsRequest) returns (ListShippingListsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
@@ -22,6 +28,13 @@ service ShippingListService {
   rpc UpdateShippingListItem(UpdateShippingListItemRequest) returns (UpdateShippingListItemResponse) {}
   rpc RemoveShippingListItem(RemoveShippingListItemRequest) returns (RemoveShippingListItemResponse) {}
   rpc RemoveShippingListItemImage(RemoveShippingListItemImageRequest) returns (RemoveShippingListItemImageResponse) {}
+}
+
+message GetShippingListFormOptionsRequest {}
+
+message GetShippingListFormOptionsResponse {
+  repeated harbour.types.v1.CompanyReference companies = 1;
+  repeated harbour.types.v1.AddressReference addresses = 2;
 }
 
 message ListShippingListsRequest {
