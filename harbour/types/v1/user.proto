@@ -17,9 +17,13 @@ message User {
     max_len: 50
   }];
   string phone_number = 5 [(buf.validate.field).string.pattern = '^\\+[1-9]\\d{1,14}$']; // https://stackoverflow.com/questions/6478875/regular-expression-matching-e-164-formatted-phone-numbers
-  bool two_factor_required = 6;
-  google.protobuf.Timestamp created_at = 7;
-  google.protobuf.Timestamp last_logged_in = 8;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp last_logged_in = 7;
+}
+
+message UserLoginHistory {
+  google.protobuf.Timestamp logged_in_at = 1;
+  string ip_address = 2;
 }
 
 message UserReference {
