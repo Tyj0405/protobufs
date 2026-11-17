@@ -2,7 +2,83 @@ syntax = "proto3";
 
 package harbour.types.v1;
 
+import "buf/validate/validate.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "harbour/types/v1/company.proto";
+import "harbour/types/v1/location.proto";
+
 message VesselReference {
   int64 id = 1;
   string name = 2;
+}
+
+enum VesselType {
+  VESSEL_TYPE_UNSPECIFIED = 0;
+  VESSEL_TYPE_CONTAINER = 1;
+  VESSEL_TYPE_BREAKBULK = 2;
+  VESSEL_TYPE_BULK = 3;
+  VESSEL_TYPE_REEFER = 4;
+  VESSEL_TYPE_RORO = 5;
+  VESSEL_TYPE_CRUISE = 6;
+}
+
+enum VesselNavigationStatus {
+  VESSEL_NAVIGATION_STATUS_UNSPECIFIED = 0;
+  VESSEL_NAVIGATION_STATUS_UNDERWAY = 1;
+  VESSEL_NAVIGATION_STATUS_ANCHORED = 2;
+  VESSEL_NAVIGATION_STATUS_MOORED = 3;
+}
+
+message VesselNavigation {
+  option (buf.validate.message).oneof = {
+    fields: [
+      "anchorage",
+      "channel",
+      "berth"
+    ]
+  };
+
+  bytes geometry = 1;
+  VesselNavigationStatus status = 2 [(buf.validate.field).enum.defined_only = true];
+  optional LocationReference anchorage = 3;
+  optional LocationReference channel = 4;
+  optional LocationReference berth = 5;
+}
+
+message VesselCreate {
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+  VesselType type = 2 [(buf.validate.field).enum.defined_only = true];
+  optional string imo = 3 [
+    (buf.validate.field).string.prefix = "IMO ",
+    (buf.validate.field).string.max_len = 11
+  ];
+  optional string mmsi = 4 [
+    (buf.validate.field).string.len = 9,
+    (buf.validate.field).string.pattern = "^[0-9]{9}$"
+  ];
+  optional string callsign = 5 [(buf.validate.field).string.min_len = 1];
+  int32 dwt = 6 [(buf.validate.field).int32.gt = 0];
+  VesselNavigation navigation = 7;
+  CompanyReference owner_company = 8;
+}
+
+message Vessel {
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+  string name = 2 [(buf.validate.field).string.min_len = 1];
+  VesselType type = 3 [(buf.validate.field).enum.defined_only = true];
+  optional string imo = 4 [
+    (buf.validate.field).string.prefix = "IMO ",
+    (buf.validate.field).string.max_len = 11
+  ];
+  optional string mmsi = 5 [
+    (buf.validate.field).string.len = 9,
+    (buf.validate.field).string.pattern = "^[0-9]{9}$"
+  ];
+  optional string callsign = 6 [(buf.validate.field).string.min_len = 1];
+  int32 dwt = 7 [(buf.validate.field).int32.gt = 0];
+  google.protobuf.Timestamp created_at = 8;
+  optional google.protobuf.Timestamp deleted_at = 9;
+  VesselNavigation navigation = 10;
+  CompanyReference owner_company = 11;
 }
