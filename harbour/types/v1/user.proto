@@ -12,14 +12,32 @@ message User {
     (buf.validate.field).string.pattern = "^[a-z0-9-_]+$" // all lower with nums, dash, and hyphen
   ];
   string email = 3 [(buf.validate.field).string.email = true];
-  string display_name = 4 [(buf.validate.field).string = {
+  optional string display_name = 4 [(buf.validate.field).string = {
     min_len: 1
     max_len: 50
   }];
-  string phone_number = 5 [(buf.validate.field).string.pattern = '^\\+[1-9]\\d{1,14}$']; // https://stackoverflow.com/questions/6478875/regular-expression-matching-e-164-formatted-phone-numbers
-  bool two_factor_required = 6;
-  google.protobuf.Timestamp created_at = 7;
-  google.protobuf.Timestamp last_logged_in = 8;
+  optional string phone_number = 5 [(buf.validate.field).string.pattern = '^\\+[1-9]\\d{1,14}$']; // https://stackoverflow.com/questions/6478875/regular-expression-matching-e-164-formatted-phone-numbers
+  google.protobuf.Timestamp created_at = 6;
+  optional google.protobuf.Timestamp deleted_at = 7;
+}
+
+message UserLoginHistory {
+  google.protobuf.Timestamp logged_in_at = 1;
+  string ip_address = 2;
+}
+
+message UserSMS2FA {
+  google.protobuf.Timestamp enabled_at = 1;
+}
+
+message UserEmail2FA {
+  google.protobuf.Timestamp enabled_at = 1;
+}
+
+message UserTotp2FA {
+  string name = 1;
+  string secret = 2;
+  google.protobuf.Timestamp enabled_at = 3;
 }
 
 message UserReference {

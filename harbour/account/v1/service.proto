@@ -4,6 +4,7 @@ package harbour.account.v1;
 
 import "buf/validate/validate.proto";
 import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
 import "harbour/types/v1/user.proto";
 
 service AccountService {
@@ -12,7 +13,15 @@ service AccountService {
   }
   rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountResponse) {}
   rpc UpdateAccountPassword(UpdateAccountPasswordRequest) returns (UpdateAccountPasswordResponse) {}
+  rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse) {}
+  rpc ViewAccountLoginHistory(ViewAccountLoginHistoryRequest) returns (ViewAccountLoginHistoryResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc ViewAccountTwoFactor(ViewAccountTwoFactorRequest) returns (ViewAccountTwoFactorResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
+  rpc SendEmailVerifyCode(SendEmailVerifyCodeRequest) returns (SendEmailVerifyCodeResponse) {}
   rpc EnableEmailTwoFactor(EnableEmailTwoFactorRequest) returns (EnableEmailTwoFactorResponse) {}
   rpc DisableEmailTwoFactor(DisableEmailTwoFactorRequest) returns (DisableEmailTwoFactorResponse) {}
   rpc EnableTotpTwoFactor(EnableTotpTwoFactorRequest) returns (EnableTotpTwoFactorResponse) {}
@@ -25,14 +34,17 @@ service AccountService {
 
 message ViewAccountRequest {}
 
-message ViewAccountResponse {}
+message ViewAccountResponse {
+  harbour.types.v1.User info = 1;
+  google.protobuf.Timestamp last_logged_in = 7;
+}
 
 message UpdateAccountRequest {
   harbour.types.v1.User info = 1;
   google.protobuf.FieldMask update_mask = 2 [(buf.validate.field).cel = {
     id: "valid_field_mask"
-    message: "a field mask path must be one of "
-    expression: "this.paths.all(path, path in [''])"
+    message: "a field mask path must be one of username, display_name, email, or phone_number"
+    expression: "this.paths.all(path, path in ['username', 'display_name', 'email', 'phone_number'])"
   }];
 }
 
@@ -45,9 +57,36 @@ message UpdateAccountPasswordRequest {
   }];
 }
 
-message UpdateAccountPasswordResponse {}
+message UpdateAccountPasswordResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
 
-message EnableEmailTwoFactorRequest {}
+message DeleteAccountRequest {}
+
+message DeleteAccountResponse {}
+
+message ViewAccountLoginHistoryRequest {}
+
+message ViewAccountLoginHistoryResponse {
+  repeated harbour.types.v1.UserLoginHistory history = 1;
+}
+
+message ViewAccountTwoFactorRequest {}
+
+message ViewAccountTwoFactorResponse {
+  optional harbour.types.v1.UserSMS2FA sms = 1;
+  optional harbour.types.v1.UserEmail2FA email = 2;
+  optional harbour.types.v1.UserTotp2FA totp = 3;
+}
+
+message SendEmailVerifyCodeRequest {}
+
+message SendEmailVerifyCodeResponse {}
+
+message EnableEmailTwoFactorRequest {
+  string code = 1;
+}
 
 message EnableEmailTwoFactorResponse {}
 
@@ -55,7 +94,11 @@ message DisableEmailTwoFactorRequest {}
 
 message DisableEmailTwoFactorResponse {}
 
-message EnableTotpTwoFactorRequest {}
+message EnableTotpTwoFactorRequest {
+  string name = 1;
+  string secret = 2;
+  string code = 3;
+}
 
 message EnableTotpTwoFactorResponse {}
 
@@ -65,7 +108,9 @@ message DisableTotpTwoFactorResponse {}
 
 message ViewBackupCodesRequest {}
 
-message ViewBackupCodesResponse {}
+message ViewBackupCodesResponse {
+  repeated string codes = 1;
+}
 
 message RefreshBackupCodesRequest {}
 
