@@ -7,7 +7,16 @@ import "google/protobuf/field_mask.proto";
 import "harbour/types/v1/address.proto";
 
 service AddressService {
+  rpc CreateAddress(CreateAddressRequest) returns (CreateAddressResponse) {}
   rpc UpdateAddress(UpdateAddressRequest) returns (UpdateAddressResponse) {}
+}
+
+message CreateAddressRequest {
+  harbour.types.v1.AddressCreate info = 1 [(buf.validate.field).required = true];
+}
+
+message CreateAddressResponse {
+  int64 created_id = 1;
 }
 
 message UpdateAddressRequest {
