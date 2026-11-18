@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package harbour.company.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "harbour/types/v1/pagination.proto";
+import "harbour/types/v1/company.proto";
+
+service CompanyService {
+  rpc ListCompanies(ListCompaniesRequest) returns (ListCompaniesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc GetCompany(GetCompanyRequest) returns (GetCompanyResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc CreateCompany(CreateCompanyRequest) returns (CreateCompanyResponse) {}
+  rpc UpdateCompany(UpdateCompanyRequest) returns (UpdateCompanyResponse) {}
+  rpc DeleteCompany(DeleteCompanyRequest) returns (DeleteCompanyResponse) {}
+}
+
+message ListCompaniesRequest {
+  optional string query = 1;
+  harbour.types.v1.PaginationRequest pagination = 2;
+}
+
+message ListCompaniesResponse {
+  repeated harbour.types.v1.Company results = 1;
+  harbour.types.v1.PaginationResponse pagination = 2;
+}
+
+message GetCompanyRequest {
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+}
+
+message GetCompanyResponse {
+  harbour.types.v1.Company info = 1;
+}
+
+message CreateCompanyRequest {
+  harbour.types.v1.CompanyCreate info = 1 [(buf.validate.field).required = true];
+}
+
+message CreateCompanyResponse {
+  int64 created_id = 1;
+}
+
+message UpdateCompanyRequest {
+  harbour.types.v1.Company info = 1 [(buf.validate.field).required = true];
+  google.protobuf.FieldMask update_mask = 2 [(buf.validate.field).cel = {
+    id: "valid_field_mask"
+    message: "a field mask path must be one of name, registration_code, email, phone_number"
+    expression: "this.paths.all(path, path in ['name', 'registration_code', 'email', 'phone_number'])"
+  }];
+}
+
+message UpdateCompanyResponse {}
+
+message DeleteCompanyRequest {
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+}
+
+message DeleteCompanyResponse {}
