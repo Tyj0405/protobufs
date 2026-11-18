@@ -38,7 +38,7 @@ message VesselNavigation {
     ]
   };
 
-  bytes geometry = 1;
+  optional bytes coordinate = 1;
   VesselNavigationStatus status = 2 [(buf.validate.field).enum.defined_only = true];
   optional LocationReference anchorage = 3;
   optional LocationReference channel = 4;
