@@ -5,12 +5,22 @@ package harbour.types.v1;
 import "buf/validate/validate.proto";
 import "harbour/types/v1/address.proto";
 
+message CompanyAddressCreate {
+  option (buf.validate.message).oneof = {
+    fields: ["new", "existing"],
+    required: true
+  };
+
+  optional AddressCreate new = 1;
+  optional int64 existing = 2;
+}
+
 message CompanyCreate {
   string name = 1 [(buf.validate.field).string.min_len = 1];
   string registration_code = 2 [(buf.validate.field).string.min_len = 2];
   string email = 3 [(buf.validate.field).string.email = true];
   string phone_number = 4 [(buf.validate.field).string.pattern = '^\\+[1-9]\\d{1,14}$'];
-  repeated AddressCreate addresses = 5;
+  repeated CompanyAddressCreate addresses = 5;
 }
 
 message Company {
