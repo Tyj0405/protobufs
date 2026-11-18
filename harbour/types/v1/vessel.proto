@@ -58,8 +58,8 @@ message VesselCreate {
   ];
   optional string callsign = 5 [(buf.validate.field).string.min_len = 1];
   int32 dwt = 6 [(buf.validate.field).int32.gt = 0];
-  VesselNavigation navigation = 7;
-  CompanyReference owner_company = 8;
+  VesselNavigation navigation = 7 [(buf.validate.field).required = true];
+  optional CompanyReference owner_company = 8;
 }
 
 message Vessel {
@@ -78,6 +78,6 @@ message Vessel {
   int32 dwt = 7 [(buf.validate.field).int32.gt = 0];
   google.protobuf.Timestamp created_at = 8;
   optional google.protobuf.Timestamp deleted_at = 9;
-  VesselNavigation navigation = 10;
-  CompanyReference owner_company = 11;
+  VesselNavigation navigation = 10 [(buf.validate.field).required = true];
+  optional CompanyReference owner_company = 11;
 }
