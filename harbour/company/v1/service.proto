@@ -4,8 +4,8 @@ package harbour.company.v1;
 
 import "buf/validate/validate.proto";
 import "google/protobuf/field_mask.proto";
-import "harbour/types/v1/pagination.proto";
 import "harbour/types/v1/company.proto";
+import "harbour/types/v1/pagination.proto";
 
 service CompanyService {
   rpc ListCompanies(ListCompaniesRequest) returns (ListCompaniesResponse) {
