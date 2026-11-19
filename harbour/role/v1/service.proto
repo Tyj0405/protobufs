@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package harbour.role.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+import "harbour/types/v1/user.proto";
+import "harbour/types/v1/roles.proto";
+import "harbour/types/v1/pagination.proto";
+
+service RoleService {
+  rpc ListRoles(ListRolesRequest) returns (ListRolesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc GetRole(GetRoleRequest) returns (GetRoleResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc CreateRole(CreateRoleRequest) returns (CreateRoleResponse) {}
+  rpc UpdateRole(UpdateRoleRequest) returns (UpdateRoleResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  rpc DeleteRole(DeleteRoleRequest) returns (DeleteRoleResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  rpc CopyRole(CopyRoleRequest) returns (CopyRoleResponse) {}
+}
+
+message ListRolesRequest {
+  harbour.types.v1.PaginationRequest pagination = 1 [(buf.validate.field).required = true];
+}
+
+message ListRolesResponse {
+  repeated harbour.types.v1.Role results = 1;
+  harbour.types.v1.PaginationResponse pagination = 2 [(buf.validate.field).required = true];
+}
+
+message GetRoleRequest {
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+}
+
+message GetRoleResponse {
+  harbour.types.v1.Role info = 1;
+}
+
+message CreateRoleRequest {
+  harbour.types.v1.RoleCreate info = 1 [(buf.validate.field).required = true];
+}
+
+message CreateRoleResponse {
+  int64 created_id = 1;
+}
+
+message UpdateRoleRequest {
+  harbour.types.v1.Role info = 1 [(buf.validate.field).required = true];
+  google.protobuf.FieldMask update_mask = 2 [(buf.validate.field).cel = {
+    id: "valid_field_mask"
+    message: "a field mask path must be one of name, remark, policies"
+    expression: "this.paths.all(path, path in ['name', 'remark', 'policies'])"
+  }];
+}
+
+message UpdateRoleResponse {}
+
+message DeleteRoleRequest {
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+}
+
+message DeleteRoleResponse {}
+
+message CopyRoleRequest {
+  int64 id = 1 [(buf.validate.field).int64.gt = 0];
+  string new_name = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message CopyRoleResponse {
+  int64 created_id = 1;
+}

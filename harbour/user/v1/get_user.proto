@@ -1,0 +1,13 @@
+syntax = 'proto3';
+
+package harbour.user.v1;
+
+import "harbour/types/v1/pagination.proto";
+
+message UserSummary {
+
+}
+
+message UserDetails {
+
+}
