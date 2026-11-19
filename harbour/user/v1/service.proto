@@ -82,7 +82,8 @@ message DeleteUserRequest {
 message DeleteUserResponse {}
 
 message UpdateUserRolesRequest {
-  repeated int64 role_ids = 1 [(buf.validate.field).repeated.items.int64.gt = 0];
+  int64 user_id = 1 [(buf.validate.field).int64.gt = 0];
+  repeated int64 role_ids = 2 [(buf.validate.field).repeated.items.int64.gt = 0];
 }
 
 message UpdateUserRolesResponse {}
