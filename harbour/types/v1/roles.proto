@@ -4,8 +4,8 @@ package harbour.types.v1;
 
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
-import "harbour/types/v1/user.proto";
 import "harbour/types/v1/policy.proto";
+import "harbour/types/v1/user.proto";
 
 message RolePolicyCreate {
   ResourcePolicy resource = 1 [(buf.validate.field).enum = {
@@ -46,4 +46,3 @@ message Role {
   optional google.protobuf.Timestamp deleted_at = 6;
   repeated RolePolicy policies = 7;
 }
-

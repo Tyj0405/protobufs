@@ -4,9 +4,8 @@ package harbour.role.v1;
 
 import "buf/validate/validate.proto";
 import "google/protobuf/field_mask.proto";
-import "harbour/types/v1/user.proto";
-import "harbour/types/v1/roles.proto";
 import "harbour/types/v1/pagination.proto";
+import "harbour/types/v1/roles.proto";
 
 service RoleService {
   rpc ListRoles(ListRolesRequest) returns (ListRolesResponse) {
