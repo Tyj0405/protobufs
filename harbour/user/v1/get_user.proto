@@ -1,0 +1,18 @@
+syntax = 'proto3';
+
+package harbour.user.v1;
+
+import "harbour/types/v1/roles.proto";
+import "harbour/types/v1/user.proto";
+
+message UserSummary {
+  harbour.types.v1.User user = 1;
+  repeated harbour.types.v1.Role roles = 2;
+  bool two_factor_needed = 3;
+}
+
+message UserDetails {
+  harbour.types.v1.User user = 1;
+  repeated harbour.types.v1.Role roles = 2;
+  bool two_factor_needed = 3;
+}
