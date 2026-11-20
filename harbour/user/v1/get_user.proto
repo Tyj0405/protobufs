@@ -2,12 +2,17 @@ syntax = 'proto3';
 
 package harbour.user.v1;
 
-import "harbour/types/v1/pagination.proto";
+import "harbour/types/v1/user.proto";
+import "harbour/types/v1/roles.proto";
 
 message UserSummary {
-
+  harbour.types.v1.User user = 1;
+  repeated harbour.types.v1.Role roles = 2;
+  bool twoFactorNeeded = 3;
 }
 
 message UserDetails {
-
+  harbour.types.v1.User user = 1;
+  repeated harbour.types.v1.Role roles = 2;
+  bool twoFactorNeeded = 3;
 }
