@@ -54,7 +54,7 @@ message CreateUserRequest {
 }
 
 message CreateUserResponse {
-  int64 id = 1;
+  int64 created_id = 1;
 }
 
 message UpdateUserRequest {
