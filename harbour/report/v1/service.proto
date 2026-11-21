@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package harbour.report.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "harbour/report/v1/operational_report.proto";
+import "harbour/types/v1/pagination.proto";
+
+// Operational reports for administrators of the authenticated tenant.
+// Authorization and tenant isolation must be enforced by the backend.
+service ReportService {
+  // Calculates statistics across all matching records, independently of any
+  // detail-page pagination. Generates a preview without saving a report.
+  rpc GenerateOperationalReport(GenerateOperationalReportRequest) returns (GenerateOperationalReportResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Retrieves existing operational records for the activity-detail report and
+  // historical review. This does not list saved reports or immutable snapshots.
+  rpc ListOperationalRecords(ListOperationalRecordsRequest) returns (ListOperationalRecordsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message GenerateOperationalReportRequest {
+  option (buf.validate.message).cel = {
+    id: "report.valid_range"
+    message: "range_start must be before range_end"
+    expression: "this.range_start < this.range_end"
+  };
+
+  // Inclusive creation-time boundary. Clients convert their chosen local date
+  // to an absolute timestamp before sending it.
+  google.protobuf.Timestamp range_start = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).timestamp = {
+      gte: {seconds: -62135596800}
+      lte: {
+        seconds: 253402300799
+        nanos: 999999999
+      }
+    }
+  ];
+  // Exclusive creation-time boundary. To include an entire final calendar day,
+  // send the beginning of the following day in the same local time zone.
+  google.protobuf.Timestamp range_end = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).timestamp = {
+      gte: {seconds: -62135596800}
+      lte: {
+        seconds: 253402300799
+        nanos: 999999999
+      }
+    }
+  ];
+}
+
+message GenerateOperationalReportResponse {
+  OperationalReport report = 1;
+}
+
+message ListOperationalRecordsRequest {
+  option (buf.validate.message).cel = {
+    id: "report.records.valid_range"
+    message: "range_start must be before range_end"
+    expression: "this.range_start < this.range_end"
+  };
+
+  // Uses the same inclusive start and exclusive end as the summary request.
+  google.protobuf.Timestamp range_start = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).timestamp = {
+      gte: {seconds: -62135596800}
+      lte: {
+        seconds: 253402300799
+        nanos: 999999999
+      }
+    }
+  ];
+  google.protobuf.Timestamp range_end = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).timestamp = {
+      gte: {seconds: -62135596800}
+      lte: {
+        seconds: 253402300799
+        nanos: 999999999
+      }
+    }
+  ];
+  // Empty means all record types.
+  repeated OperationalRecordType record_type = 3 [(buf.validate.field).repeated = {
+    unique: true
+    items: {
+      enum: {
+        defined_only: true
+        not_in: 0
+      }
+    }
+  }];
+  harbour.types.v1.PaginationRequest pagination = 4 [(buf.validate.field).required = true];
+}
+
+message ListOperationalRecordsResponse {
+  // Ordered by occurred_at descending, record type enum value ascending, then
+  // record ID descending. Movement ties use movement_type ascending before ID,
+  // since loading and unloading records may have the same numeric ID.
+  repeated OperationalRecord results = 1;
+  harbour.types.v1.PaginationResponse pagination = 2;
+  google.protobuf.Timestamp generated_at = 3;
+}
