@@ -2,13 +2,30 @@ syntax = "proto3";
 
 package harbour.dashboard.v1;
 
+import "buf/validate/validate.proto";
 import "harbour/dashboard/v1/create_dashboard.proto";
 
 message UpdateDashboard {
-  optional string name = 1;
-  optional int64 port_id = 2;
+  option (buf.validate.message).cel = {
+    id: "dashboard.updatedashboard.unique_component"
+    message: "each layout component must be unique"
+    expression: "this.layouts.map(layout, layout.component_id).unique()"
+  };
+  option (buf.validate.message).cel = {
+    id: "dashboard.updatedashboard.unique_position"
+    message: "each layout position must be unique"
+    expression: "this.layouts.map(layout, layout.position).unique()"
+  };
+
+  optional string name = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 200
+    pattern: "(?s).*[^[:space:]].*"
+  }];
+  optional int64 port_id = 2 [(buf.validate.field).int64.gt = 0];
 
   // This list is the complete desired layout. Components omitted from the list
   // are removed, and the position values define the new display order.
+  // An empty list is valid and hides all blocks.
   repeated DashboardLayoutInput layouts = 3;
 }
