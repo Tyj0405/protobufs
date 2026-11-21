@@ -14,6 +14,12 @@ import "harbour/types/v1/pagination.proto";
 import "harbour/types/v1/task.proto";
 
 service UserDashboardService {
+  // Counts active companies, users and infrastructure across the authenticated
+  // tenant. Infrastructure includes ports and their active locations/facilities.
+  rpc GetOperationalResourceCounts(GetOperationalResourceCountsRequest) returns (GetOperationalResourceCountsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
   // Returns the current operational statistics and recent activities displayed
   // by the dashboard UI.
   rpc GetOperationalOverview(GetOperationalOverviewRequest) returns (GetOperationalOverviewResponse) {
@@ -43,6 +49,15 @@ service DashboardService {
 
   // Administrator operations for dashboards shared by default for a port.
   rpc SetPortDefaultDashboardPreference(SetPortDefaultDashboardPreferenceRequest) returns (SetPortDefaultDashboardPreferenceResponse) {}
+}
+
+message GetOperationalResourceCountsRequest {}
+
+message GetOperationalResourceCountsResponse {
+  uint64 company_count = 1;
+  uint64 user_count = 2;
+  uint64 infrastructure_count = 3;
+  google.protobuf.Timestamp generated_at = 4;
 }
 
 message GetOperationalOverviewRequest {
